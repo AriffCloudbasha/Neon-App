@@ -15,8 +15,6 @@ describe("productPrice service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("productPrice");
 
@@ -32,8 +30,8 @@ describe("productPrice service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,38 +41,66 @@ describe("productPrice service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"basePrice":"new value","discountedPrice":"new value","taxPercentage":"new value"};
+    const options = {
+      basePrice: "new value",
+      discountedPrice: "new value",
+      taxPercentage: "new value",
+    };
 
     beforeEach(async () => {
-      productPriceCreated = await thisService.Model.create({...options, ...users});
+      productPriceCreated = await thisService.Model.create({
+        ...options,
+        ...users,
+      });
     });
 
     it("should create a new productPrice", () => {
       assert.strictEqual(productPriceCreated.basePrice, options.basePrice);
-assert.strictEqual(productPriceCreated.discountedPrice, options.discountedPrice);
-assert.strictEqual(productPriceCreated.taxPercentage, options.taxPercentage);
+      assert.strictEqual(
+        productPriceCreated.discountedPrice,
+        options.discountedPrice,
+      );
+      assert.strictEqual(
+        productPriceCreated.taxPercentage,
+        options.taxPercentage,
+      );
     });
   });
 
   describe("#get", () => {
     it("should retrieve a productPrice by ID", async () => {
-      const retrieved = await thisService.Model.findById(productPriceCreated._id);
-      assert.strictEqual(retrieved._id.toString(), productPriceCreated._id.toString());
+      const retrieved = await thisService.Model.findById(
+        productPriceCreated._id,
+      );
+      assert.strictEqual(
+        retrieved._id.toString(),
+        productPriceCreated._id.toString(),
+      );
     });
   });
 
   describe("#update", () => {
-    const options = {"basePrice":"updated value","discountedPrice":"updated value","taxPercentage":"updated value"};
+    const options = {
+      basePrice: "updated value",
+      discountedPrice: "updated value",
+      taxPercentage: "updated value",
+    };
 
     it("should update an existing productPrice ", async () => {
       const productPriceUpdated = await thisService.Model.findByIdAndUpdate(
-        productPriceCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        productPriceCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(productPriceUpdated.basePrice, options.basePrice);
-assert.strictEqual(productPriceUpdated.discountedPrice, options.discountedPrice);
-assert.strictEqual(productPriceUpdated.taxPercentage, options.taxPercentage);
+      assert.strictEqual(
+        productPriceUpdated.discountedPrice,
+        options.discountedPrice,
+      );
+      assert.strictEqual(
+        productPriceUpdated.taxPercentage,
+        options.taxPercentage,
+      );
     });
   });
 
@@ -84,10 +110,13 @@ assert.strictEqual(productPriceUpdated.taxPercentage, options.taxPercentage);
         .service("users")
         .Model.findByIdAndDelete(usersServiceResults._id);
 
-      ;
-
-      const productPriceDeleted = await thisService.Model.findByIdAndDelete(productPriceCreated._id);
-      assert.strictEqual(productPriceDeleted._id.toString(), productPriceCreated._id.toString());
+      const productPriceDeleted = await thisService.Model.findByIdAndDelete(
+        productPriceCreated._id,
+      );
+      assert.strictEqual(
+        productPriceDeleted._id.toString(),
+        productPriceCreated._id.toString(),
+      );
     });
   });
 });

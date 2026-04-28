@@ -1,5 +1,5 @@
 module.exports = {
-    maxRetriesPerRequest: null,
-    host: 'redis',
-    port: 6379
+  maxRetriesPerRequest: null,
+  host: "redis",
+  port: 6379,
 };

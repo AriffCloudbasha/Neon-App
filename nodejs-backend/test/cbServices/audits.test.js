@@ -15,8 +15,6 @@ describe("audits service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("audits");
 
@@ -32,8 +30,8 @@ describe("audits service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,17 +41,22 @@ describe("audits service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"serviceName":["new value"],"action":"new value","details":"new value","method":"new value"};
+    const options = {
+      serviceName: ["new value"],
+      action: "new value",
+      details: "new value",
+      method: "new value",
+    };
 
     beforeEach(async () => {
-      auditCreated = await thisService.Model.create({...options, ...users});
+      auditCreated = await thisService.Model.create({ ...options, ...users });
     });
 
     it("should create a new audit", () => {
       assert.strictEqual(auditCreated.serviceName, options.serviceName);
-assert.strictEqual(auditCreated.action, options.action);
-assert.strictEqual(auditCreated.details, options.details);
-assert.strictEqual(auditCreated.method, options.method);
+      assert.strictEqual(auditCreated.action, options.action);
+      assert.strictEqual(auditCreated.details, options.details);
+      assert.strictEqual(auditCreated.method, options.method);
     });
   });
 
@@ -65,28 +68,35 @@ assert.strictEqual(auditCreated.method, options.method);
   });
 
   describe("#update", () => {
-    const options = {"serviceName":["updated value"],"action":"updated value","details":"updated value","method":"updated value"};
+    const options = {
+      serviceName: ["updated value"],
+      action: "updated value",
+      details: "updated value",
+      method: "updated value",
+    };
 
     it("should update an existing audit ", async () => {
       const auditUpdated = await thisService.Model.findByIdAndUpdate(
-        auditCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        auditCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(auditUpdated.serviceName, options.serviceName);
-assert.strictEqual(auditUpdated.action, options.action);
-assert.strictEqual(auditUpdated.details, options.details);
-assert.strictEqual(auditUpdated.method, options.method);
+      assert.strictEqual(auditUpdated.action, options.action);
+      assert.strictEqual(auditUpdated.details, options.details);
+      assert.strictEqual(auditUpdated.method, options.method);
     });
   });
 
   describe("#delete", async () => {
     it("should delete a audit", async () => {
-
-      ;
-
-      const auditDeleted = await thisService.Model.findByIdAndDelete(auditCreated._id);
-      assert.strictEqual(auditDeleted._id.toString(), auditCreated._id.toString());
+      const auditDeleted = await thisService.Model.findByIdAndDelete(
+        auditCreated._id,
+      );
+      assert.strictEqual(
+        auditDeleted._id.toString(),
+        auditCreated._id.toString(),
+      );
     });
   });
 });

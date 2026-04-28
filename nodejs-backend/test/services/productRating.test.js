@@ -15,8 +15,6 @@ describe("productRating service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("productRating");
 
@@ -32,8 +30,8 @@ describe("productRating service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,38 +41,60 @@ describe("productRating service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"productName":"new value","customerName":"new value","starRating":23};
+    const options = {
+      productName: "new value",
+      customerName: "new value",
+      starRating: 23,
+    };
 
     beforeEach(async () => {
-      productRatingCreated = await thisService.Model.create({...options, ...users});
+      productRatingCreated = await thisService.Model.create({
+        ...options,
+        ...users,
+      });
     });
 
     it("should create a new productRating", () => {
       assert.strictEqual(productRatingCreated.productName, options.productName);
-assert.strictEqual(productRatingCreated.customerName, options.customerName);
-assert.strictEqual(productRatingCreated.starRating, options.starRating);
+      assert.strictEqual(
+        productRatingCreated.customerName,
+        options.customerName,
+      );
+      assert.strictEqual(productRatingCreated.starRating, options.starRating);
     });
   });
 
   describe("#get", () => {
     it("should retrieve a productRating by ID", async () => {
-      const retrieved = await thisService.Model.findById(productRatingCreated._id);
-      assert.strictEqual(retrieved._id.toString(), productRatingCreated._id.toString());
+      const retrieved = await thisService.Model.findById(
+        productRatingCreated._id,
+      );
+      assert.strictEqual(
+        retrieved._id.toString(),
+        productRatingCreated._id.toString(),
+      );
     });
   });
 
   describe("#update", () => {
-    const options = {"productName":"updated value","customerName":"updated value","starRating":100};
+    const options = {
+      productName: "updated value",
+      customerName: "updated value",
+      starRating: 100,
+    };
 
     it("should update an existing productRating ", async () => {
       const productRatingUpdated = await thisService.Model.findByIdAndUpdate(
-        productRatingCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        productRatingCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(productRatingUpdated.productName, options.productName);
-assert.strictEqual(productRatingUpdated.customerName, options.customerName);
-assert.strictEqual(productRatingUpdated.starRating, options.starRating);
+      assert.strictEqual(
+        productRatingUpdated.customerName,
+        options.customerName,
+      );
+      assert.strictEqual(productRatingUpdated.starRating, options.starRating);
     });
   });
 
@@ -84,10 +104,13 @@ assert.strictEqual(productRatingUpdated.starRating, options.starRating);
         .service("users")
         .Model.findByIdAndDelete(usersServiceResults._id);
 
-      ;
-
-      const productRatingDeleted = await thisService.Model.findByIdAndDelete(productRatingCreated._id);
-      assert.strictEqual(productRatingDeleted._id.toString(), productRatingCreated._id.toString());
+      const productRatingDeleted = await thisService.Model.findByIdAndDelete(
+        productRatingCreated._id,
+      );
+      assert.strictEqual(
+        productRatingDeleted._id.toString(),
+        productRatingCreated._id.toString(),
+      );
     });
   });
 });

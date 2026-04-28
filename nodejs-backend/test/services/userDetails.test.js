@@ -15,8 +15,6 @@ describe("userDetails service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("userDetails");
 
@@ -32,8 +30,8 @@ describe("userDetails service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,36 +41,42 @@ describe("userDetails service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"email":"new value","passwordHash":"new value"};
+    const options = { email: "new value", passwordHash: "new value" };
 
     beforeEach(async () => {
-      userDetailCreated = await thisService.Model.create({...options, ...users});
+      userDetailCreated = await thisService.Model.create({
+        ...options,
+        ...users,
+      });
     });
 
     it("should create a new userDetail", () => {
       assert.strictEqual(userDetailCreated.email, options.email);
-assert.strictEqual(userDetailCreated.passwordHash, options.passwordHash);
+      assert.strictEqual(userDetailCreated.passwordHash, options.passwordHash);
     });
   });
 
   describe("#get", () => {
     it("should retrieve a userDetail by ID", async () => {
       const retrieved = await thisService.Model.findById(userDetailCreated._id);
-      assert.strictEqual(retrieved._id.toString(), userDetailCreated._id.toString());
+      assert.strictEqual(
+        retrieved._id.toString(),
+        userDetailCreated._id.toString(),
+      );
     });
   });
 
   describe("#update", () => {
-    const options = {"email":"updated value","passwordHash":"updated value"};
+    const options = { email: "updated value", passwordHash: "updated value" };
 
     it("should update an existing userDetail ", async () => {
       const userDetailUpdated = await thisService.Model.findByIdAndUpdate(
-        userDetailCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        userDetailCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(userDetailUpdated.email, options.email);
-assert.strictEqual(userDetailUpdated.passwordHash, options.passwordHash);
+      assert.strictEqual(userDetailUpdated.passwordHash, options.passwordHash);
     });
   });
 
@@ -82,10 +86,13 @@ assert.strictEqual(userDetailUpdated.passwordHash, options.passwordHash);
         .service("users")
         .Model.findByIdAndDelete(usersServiceResults._id);
 
-      ;
-
-      const userDetailDeleted = await thisService.Model.findByIdAndDelete(userDetailCreated._id);
-      assert.strictEqual(userDetailDeleted._id.toString(), userDetailCreated._id.toString());
+      const userDetailDeleted = await thisService.Model.findByIdAndDelete(
+        userDetailCreated._id,
+      );
+      assert.strictEqual(
+        userDetailDeleted._id.toString(),
+        userDetailCreated._id.toString(),
+      );
     });
   });
 });

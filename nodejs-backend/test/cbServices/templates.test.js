@@ -15,8 +15,6 @@ describe("templates service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("templates");
 
@@ -32,8 +30,8 @@ describe("templates service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,52 +41,72 @@ describe("templates service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"name":"new value","subject":"new value","body":"new value","variables":"new value","image":"new value"};
+    const options = {
+      name: "new value",
+      subject: "new value",
+      body: "new value",
+      variables: "new value",
+      image: "new value",
+    };
 
     beforeEach(async () => {
-      templateCreated = await thisService.Model.create({...options, ...users});
+      templateCreated = await thisService.Model.create({
+        ...options,
+        ...users,
+      });
     });
 
     it("should create a new template", () => {
       assert.strictEqual(templateCreated.name, options.name);
-assert.strictEqual(templateCreated.subject, options.subject);
-assert.strictEqual(templateCreated.body, options.body);
-assert.strictEqual(templateCreated.variables, options.variables);
-assert.strictEqual(templateCreated.image, options.image);
+      assert.strictEqual(templateCreated.subject, options.subject);
+      assert.strictEqual(templateCreated.body, options.body);
+      assert.strictEqual(templateCreated.variables, options.variables);
+      assert.strictEqual(templateCreated.image, options.image);
     });
   });
 
   describe("#get", () => {
     it("should retrieve a template by ID", async () => {
       const retrieved = await thisService.Model.findById(templateCreated._id);
-      assert.strictEqual(retrieved._id.toString(), templateCreated._id.toString());
+      assert.strictEqual(
+        retrieved._id.toString(),
+        templateCreated._id.toString(),
+      );
     });
   });
 
   describe("#update", () => {
-    const options = {"name":"updated value","subject":"updated value","body":"updated value","variables":"updated value","image":"updated value"};
+    const options = {
+      name: "updated value",
+      subject: "updated value",
+      body: "updated value",
+      variables: "updated value",
+      image: "updated value",
+    };
 
     it("should update an existing template ", async () => {
       const templateUpdated = await thisService.Model.findByIdAndUpdate(
-        templateCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        templateCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(templateUpdated.name, options.name);
-assert.strictEqual(templateUpdated.subject, options.subject);
-assert.strictEqual(templateUpdated.body, options.body);
-assert.strictEqual(templateUpdated.variables, options.variables);
-assert.strictEqual(templateUpdated.image, options.image);
+      assert.strictEqual(templateUpdated.subject, options.subject);
+      assert.strictEqual(templateUpdated.body, options.body);
+      assert.strictEqual(templateUpdated.variables, options.variables);
+      assert.strictEqual(templateUpdated.image, options.image);
     });
   });
 
   describe("#delete", async () => {
     it("should delete a template", async () => {
-
-      ;
-
-      const templateDeleted = await thisService.Model.findByIdAndDelete(templateCreated._id);
-      assert.strictEqual(templateDeleted._id.toString(), templateCreated._id.toString());
+      const templateDeleted = await thisService.Model.findByIdAndDelete(
+        templateCreated._id,
+      );
+      assert.strictEqual(
+        templateDeleted._id.toString(),
+        templateCreated._id.toString(),
+      );
     });
   });
 });

@@ -34,5 +34,5 @@ module.exports = function (app) {
   app.configure(orderProduct);
   app.configure(orderHistory);
   app.configure(userDetails);
-    // ~cb-add-configure-service-name~
+  // ~cb-add-configure-service-name~
 };

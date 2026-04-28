@@ -15,8 +15,6 @@ describe("roles service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("roles");
 
@@ -32,8 +30,8 @@ describe("roles service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,17 +41,21 @@ describe("roles service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"name":"new value","description":"new value","isDefault":true};
+    const options = {
+      name: "new value",
+      description: "new value",
+      isDefault: true,
+    };
 
     beforeEach(async () => {
-      roleCreated = await thisService.Model.create({...options, ...users});
+      roleCreated = await thisService.Model.create({ ...options, ...users });
     });
 
     it("should create a new role", () => {
       assert.strictEqual(roleCreated.name, options.name);
-assert.strictEqual(roleCreated.description, options.description);
-assert.strictEqual(roleCreated.isDefault, options.isDefault);
-assert.strictEqual(roleCreated.isDefault, options.isDefault);
+      assert.strictEqual(roleCreated.description, options.description);
+      assert.strictEqual(roleCreated.isDefault, options.isDefault);
+      assert.strictEqual(roleCreated.isDefault, options.isDefault);
     });
   });
 
@@ -65,28 +67,34 @@ assert.strictEqual(roleCreated.isDefault, options.isDefault);
   });
 
   describe("#update", () => {
-    const options = {"name":"updated value","description":"updated value","isDefault":false};
+    const options = {
+      name: "updated value",
+      description: "updated value",
+      isDefault: false,
+    };
 
     it("should update an existing role ", async () => {
       const roleUpdated = await thisService.Model.findByIdAndUpdate(
-        roleCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        roleCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(roleUpdated.name, options.name);
-assert.strictEqual(roleUpdated.description, options.description);
-assert.strictEqual(roleUpdated.isDefault, options.isDefault);
-assert.strictEqual(roleUpdated.isDefault, options.isDefault);
+      assert.strictEqual(roleUpdated.description, options.description);
+      assert.strictEqual(roleUpdated.isDefault, options.isDefault);
+      assert.strictEqual(roleUpdated.isDefault, options.isDefault);
     });
   });
 
   describe("#delete", async () => {
     it("should delete a role", async () => {
-
-      ;
-
-      const roleDeleted = await thisService.Model.findByIdAndDelete(roleCreated._id);
-      assert.strictEqual(roleDeleted._id.toString(), roleCreated._id.toString());
+      const roleDeleted = await thisService.Model.findByIdAndDelete(
+        roleCreated._id,
+      );
+      assert.strictEqual(
+        roleDeleted._id.toString(),
+        roleCreated._id.toString(),
+      );
     });
   });
 });

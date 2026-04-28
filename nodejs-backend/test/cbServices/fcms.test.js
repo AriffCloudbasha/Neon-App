@@ -15,8 +15,6 @@ describe("fcms service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("fcms");
 
@@ -32,8 +30,8 @@ describe("fcms service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,17 +41,17 @@ describe("fcms service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"fcmId":"new value","device":"new value","valid":true};
+    const options = { fcmId: "new value", device: "new value", valid: true };
 
     beforeEach(async () => {
-      fcmCreated = await thisService.Model.create({...options, ...users});
+      fcmCreated = await thisService.Model.create({ ...options, ...users });
     });
 
     it("should create a new fcm", () => {
       assert.strictEqual(fcmCreated.fcmId, options.fcmId);
-assert.strictEqual(fcmCreated.device, options.device);
-assert.strictEqual(fcmCreated.valid, options.valid);
-assert.strictEqual(fcmCreated.valid, options.valid);
+      assert.strictEqual(fcmCreated.device, options.device);
+      assert.strictEqual(fcmCreated.valid, options.valid);
+      assert.strictEqual(fcmCreated.valid, options.valid);
     });
   });
 
@@ -65,27 +63,30 @@ assert.strictEqual(fcmCreated.valid, options.valid);
   });
 
   describe("#update", () => {
-    const options = {"fcmId":"updated value","device":"updated value","valid":false};
+    const options = {
+      fcmId: "updated value",
+      device: "updated value",
+      valid: false,
+    };
 
     it("should update an existing fcm ", async () => {
       const fcmUpdated = await thisService.Model.findByIdAndUpdate(
-        fcmCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        fcmCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(fcmUpdated.fcmId, options.fcmId);
-assert.strictEqual(fcmUpdated.device, options.device);
-assert.strictEqual(fcmUpdated.valid, options.valid);
-assert.strictEqual(fcmUpdated.valid, options.valid);
+      assert.strictEqual(fcmUpdated.device, options.device);
+      assert.strictEqual(fcmUpdated.valid, options.valid);
+      assert.strictEqual(fcmUpdated.valid, options.valid);
     });
   });
 
   describe("#delete", async () => {
     it("should delete a fcm", async () => {
-
-      ;
-
-      const fcmDeleted = await thisService.Model.findByIdAndDelete(fcmCreated._id);
+      const fcmDeleted = await thisService.Model.findByIdAndDelete(
+        fcmCreated._id,
+      );
       assert.strictEqual(fcmDeleted._id.toString(), fcmCreated._id.toString());
     });
   });

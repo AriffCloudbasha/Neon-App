@@ -15,8 +15,6 @@ describe("departmentHOS service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("departmentHOS");
 
@@ -32,8 +30,8 @@ describe("departmentHOS service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,10 +41,13 @@ describe("departmentHOS service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"name":"new value"};
+    const options = { name: "new value" };
 
     beforeEach(async () => {
-      departmentHOCreated = await thisService.Model.create({...options, ...users});
+      departmentHOCreated = await thisService.Model.create({
+        ...options,
+        ...users,
+      });
     });
 
     it("should create a new departmentHO", () => {
@@ -56,19 +57,24 @@ describe("departmentHOS service", async () => {
 
   describe("#get", () => {
     it("should retrieve a departmentHO by ID", async () => {
-      const retrieved = await thisService.Model.findById(departmentHOCreated._id);
-      assert.strictEqual(retrieved._id.toString(), departmentHOCreated._id.toString());
+      const retrieved = await thisService.Model.findById(
+        departmentHOCreated._id,
+      );
+      assert.strictEqual(
+        retrieved._id.toString(),
+        departmentHOCreated._id.toString(),
+      );
     });
   });
 
   describe("#update", () => {
-    const options = {"name":"updated value"};
+    const options = { name: "updated value" };
 
     it("should update an existing departmentHO ", async () => {
       const departmentHOUpdated = await thisService.Model.findByIdAndUpdate(
-        departmentHOCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        departmentHOCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(departmentHOUpdated.name, options.name);
     });
@@ -76,11 +82,13 @@ describe("departmentHOS service", async () => {
 
   describe("#delete", async () => {
     it("should delete a departmentHO", async () => {
-
-      ;
-
-      const departmentHODeleted = await thisService.Model.findByIdAndDelete(departmentHOCreated._id);
-      assert.strictEqual(departmentHODeleted._id.toString(), departmentHOCreated._id.toString());
+      const departmentHODeleted = await thisService.Model.findByIdAndDelete(
+        departmentHOCreated._id,
+      );
+      assert.strictEqual(
+        departmentHODeleted._id.toString(),
+        departmentHOCreated._id.toString(),
+      );
     });
   });
 });

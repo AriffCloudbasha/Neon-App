@@ -15,9 +15,55 @@ describe("cart service", async () => {
   let usersServiceResults;
   let users;
 
-  const customerAddressCreated = await app.service("customerAddress").Model.create({"customerName":"parentObjectId","customers":"new value","customerEmail":"new value","customerAddress":"parentObjectId","addressType":"new value","country":"new value","addressLine1":"new value","addressLine2":"new value","city":"new value","postalCode":23});
-const customerDetailsCreated = await app.service("customerDetails").Model.create({"customerName":"parentObjectId","customers":"new value","customerEmail":"new value","customerAddress":`${customerAddressCreated._id}`,"addressType":"new value","country":"new value","addressLine1":"new value","addressLine2":"new value","city":"new value","postalCode":23,"phoneNumber":"new value","gender":["new value"],"dateOfBirth":"2026-04-27T06:45:18.535Z"});
-const cartItemsCreated = await app.service("cartItems").Model.create({"customerName":`${customerDetailsCreated._id}`,"customers":"new value","customerEmail":"new value","customerAddress":`${customerAddressCreated._id}`,"addressType":"new value","country":"new value","addressLine1":"new value","addressLine2":"new value","city":"new value","postalCode":23,"phoneNumber":"new value","gender":["new value"],"dateOfBirth":"2026-04-27T06:45:18.535Z","items":"parentObjectId","productName":"new value","quantity":23});
+  const customerAddressCreated = await app
+    .service("customerAddress")
+    .Model.create({
+      customerName: "parentObjectId",
+      customers: "new value",
+      customerEmail: "new value",
+      customerAddress: "parentObjectId",
+      addressType: "new value",
+      country: "new value",
+      addressLine1: "new value",
+      addressLine2: "new value",
+      city: "new value",
+      postalCode: 23,
+    });
+  const customerDetailsCreated = await app
+    .service("customerDetails")
+    .Model.create({
+      customerName: "parentObjectId",
+      customers: "new value",
+      customerEmail: "new value",
+      customerAddress: `${customerAddressCreated._id}`,
+      addressType: "new value",
+      country: "new value",
+      addressLine1: "new value",
+      addressLine2: "new value",
+      city: "new value",
+      postalCode: 23,
+      phoneNumber: "new value",
+      gender: ["new value"],
+      dateOfBirth: "2026-04-27T06:45:18.535Z",
+    });
+  const cartItemsCreated = await app.service("cartItems").Model.create({
+    customerName: `${customerDetailsCreated._id}`,
+    customers: "new value",
+    customerEmail: "new value",
+    customerAddress: `${customerAddressCreated._id}`,
+    addressType: "new value",
+    country: "new value",
+    addressLine1: "new value",
+    addressLine2: "new value",
+    city: "new value",
+    postalCode: 23,
+    phoneNumber: "new value",
+    gender: ["new value"],
+    dateOfBirth: "2026-04-27T06:45:18.535Z",
+    items: "parentObjectId",
+    productName: "new value",
+    quantity: 23,
+  });
 
   beforeEach(async () => {
     thisService = await app.service("cart");
@@ -34,8 +80,8 @@ const cartItemsCreated = await app.service("cartItems").Model.create({"customerN
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -45,18 +91,44 @@ const cartItemsCreated = await app.service("cartItems").Model.create({"customerN
   });
 
   describe("#create", () => {
-    const options = {"customerName":`${customerDetailsCreated._id}`,"customers":"new value","customerEmail":"new value","customerAddress":`${customerAddressCreated._id}`,"addressType":"new value","country":"new value","addressLine1":"new value","addressLine2":"new value","city":"new value","postalCode":23,"phoneNumber":"new value","gender":["new value"],"dateOfBirth":"2026-04-27T06:45:18.535Z","items":`${cartItemsCreated._id}`,"productName":"new value","quantity":23,"subtotal":23,"total":23,"tax":23};
+    const options = {
+      customerName: `${customerDetailsCreated._id}`,
+      customers: "new value",
+      customerEmail: "new value",
+      customerAddress: `${customerAddressCreated._id}`,
+      addressType: "new value",
+      country: "new value",
+      addressLine1: "new value",
+      addressLine2: "new value",
+      city: "new value",
+      postalCode: 23,
+      phoneNumber: "new value",
+      gender: ["new value"],
+      dateOfBirth: "2026-04-27T06:45:18.535Z",
+      items: `${cartItemsCreated._id}`,
+      productName: "new value",
+      quantity: 23,
+      subtotal: 23,
+      total: 23,
+      tax: 23,
+    };
 
     beforeEach(async () => {
-      cartCreated = await thisService.Model.create({...options, ...users});
+      cartCreated = await thisService.Model.create({ ...options, ...users });
     });
 
     it("should create a new cart", () => {
-      assert.strictEqual(cartCreated.customerName.toString(), options.customerName.toString());
-assert.strictEqual(cartCreated.items.toString(), options.items.toString());
-assert.strictEqual(cartCreated.subtotal, options.subtotal);
-assert.strictEqual(cartCreated.total, options.total);
-assert.strictEqual(cartCreated.tax, options.tax);
+      assert.strictEqual(
+        cartCreated.customerName.toString(),
+        options.customerName.toString(),
+      );
+      assert.strictEqual(
+        cartCreated.items.toString(),
+        options.items.toString(),
+      );
+      assert.strictEqual(cartCreated.subtotal, options.subtotal);
+      assert.strictEqual(cartCreated.total, options.total);
+      assert.strictEqual(cartCreated.tax, options.tax);
     });
   });
 
@@ -68,19 +140,31 @@ assert.strictEqual(cartCreated.tax, options.tax);
   });
 
   describe("#update", () => {
-    const options = {"customerName":`${customerDetailsCreated._id}`,"items":`${cartItemsCreated._id}`,"subtotal":100,"total":100,"tax":100};
+    const options = {
+      customerName: `${customerDetailsCreated._id}`,
+      items: `${cartItemsCreated._id}`,
+      subtotal: 100,
+      total: 100,
+      tax: 100,
+    };
 
     it("should update an existing cart ", async () => {
       const cartUpdated = await thisService.Model.findByIdAndUpdate(
-        cartCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        cartCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
-      assert.strictEqual(cartUpdated.customerName.toString(), options.customerName.toString());
-assert.strictEqual(cartUpdated.items.toString(), options.items.toString());
-assert.strictEqual(cartUpdated.subtotal, options.subtotal);
-assert.strictEqual(cartUpdated.total, options.total);
-assert.strictEqual(cartUpdated.tax, options.tax);
+      assert.strictEqual(
+        cartUpdated.customerName.toString(),
+        options.customerName.toString(),
+      );
+      assert.strictEqual(
+        cartUpdated.items.toString(),
+        options.items.toString(),
+      );
+      assert.strictEqual(cartUpdated.subtotal, options.subtotal);
+      assert.strictEqual(cartUpdated.total, options.total);
+      assert.strictEqual(cartUpdated.tax, options.tax);
     });
   });
 
@@ -90,12 +174,23 @@ assert.strictEqual(cartUpdated.tax, options.tax);
         .service("users")
         .Model.findByIdAndDelete(usersServiceResults._id);
 
-      await app.service("customerAddress").Model.findByIdAndDelete(customerAddressCreated._id);
-await app.service("customerDetails").Model.findByIdAndDelete(customerDetailsCreated._id);
-await app.service("cartItems").Model.findByIdAndDelete(cartItemsCreated._id);;
+      await app
+        .service("customerAddress")
+        .Model.findByIdAndDelete(customerAddressCreated._id);
+      await app
+        .service("customerDetails")
+        .Model.findByIdAndDelete(customerDetailsCreated._id);
+      await app
+        .service("cartItems")
+        .Model.findByIdAndDelete(cartItemsCreated._id);
 
-      const cartDeleted = await thisService.Model.findByIdAndDelete(cartCreated._id);
-      assert.strictEqual(cartDeleted._id.toString(), cartCreated._id.toString());
+      const cartDeleted = await thisService.Model.findByIdAndDelete(
+        cartCreated._id,
+      );
+      assert.strictEqual(
+        cartDeleted._id.toString(),
+        cartCreated._id.toString(),
+      );
     });
   });
 });

@@ -15,8 +15,6 @@ describe("cartItems service", async () => {
   let usersServiceResults;
   let users;
 
-  
-
   beforeEach(async () => {
     thisService = await app.service("cartItems");
 
@@ -32,8 +30,8 @@ describe("cartItems service", async () => {
     if (usersServiceResults) {
       await Promise.all(
         usersServiceResults.map((i) =>
-          app.service("users").Model.findByIdAndDelete(i._id)
-        )
+          app.service("users").Model.findByIdAndDelete(i._id),
+        ),
       );
     }
   });
@@ -43,36 +41,42 @@ describe("cartItems service", async () => {
   });
 
   describe("#create", () => {
-    const options = {"productName":"new value","quantity":23};
+    const options = { productName: "new value", quantity: 23 };
 
     beforeEach(async () => {
-      cartItemCreated = await thisService.Model.create({...options, ...users});
+      cartItemCreated = await thisService.Model.create({
+        ...options,
+        ...users,
+      });
     });
 
     it("should create a new cartItem", () => {
       assert.strictEqual(cartItemCreated.productName, options.productName);
-assert.strictEqual(cartItemCreated.quantity, options.quantity);
+      assert.strictEqual(cartItemCreated.quantity, options.quantity);
     });
   });
 
   describe("#get", () => {
     it("should retrieve a cartItem by ID", async () => {
       const retrieved = await thisService.Model.findById(cartItemCreated._id);
-      assert.strictEqual(retrieved._id.toString(), cartItemCreated._id.toString());
+      assert.strictEqual(
+        retrieved._id.toString(),
+        cartItemCreated._id.toString(),
+      );
     });
   });
 
   describe("#update", () => {
-    const options = {"productName":"updated value","quantity":100};
+    const options = { productName: "updated value", quantity: 100 };
 
     it("should update an existing cartItem ", async () => {
       const cartItemUpdated = await thisService.Model.findByIdAndUpdate(
-        cartItemCreated._id, 
-        options, 
-        { new: true } // Ensure it returns the updated doc
+        cartItemCreated._id,
+        options,
+        { new: true }, // Ensure it returns the updated doc
       );
       assert.strictEqual(cartItemUpdated.productName, options.productName);
-assert.strictEqual(cartItemUpdated.quantity, options.quantity);
+      assert.strictEqual(cartItemUpdated.quantity, options.quantity);
     });
   });
 
@@ -82,10 +86,13 @@ assert.strictEqual(cartItemUpdated.quantity, options.quantity);
         .service("users")
         .Model.findByIdAndDelete(usersServiceResults._id);
 
-      ;
-
-      const cartItemDeleted = await thisService.Model.findByIdAndDelete(cartItemCreated._id);
-      assert.strictEqual(cartItemDeleted._id.toString(), cartItemCreated._id.toString());
+      const cartItemDeleted = await thisService.Model.findByIdAndDelete(
+        cartItemCreated._id,
+      );
+      assert.strictEqual(
+        cartItemDeleted._id.toString(),
+        cartItemCreated._id.toString(),
+      );
     });
   });
 });
