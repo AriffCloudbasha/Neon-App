@@ -187,102 +187,102 @@ const AppSideBar = (props) => {
                   menuKey="dashboard"
                   to="/cbAdmin/dashboard"
                   menus={[
-{
-                  icon: <Home />,
-                  label: "Category",
-                  menuKey: "category",
-                  to: "/app/category",
-                },
-{
-                  icon: <Home />,
-                  label: "Product",
-                  menuKey: "product",
-                  to: "/app/product",
-                },
-{
-                  icon: <Home />,
-                  label: "Product Color",
-                  menuKey: "productColor",
-                  to: "/app/productColor",
-                },
-{
-                  icon: <Home />,
-                  label: "Product Price",
-                  menuKey: "productPrice",
-                  to: "/app/productPrice",
-                },
-{
-                  icon: <Home />,
-                  label: "Product Size",
-                  menuKey: "productSize",
-                  to: "/app/productSize",
-                },
-{
-                  icon: <Home />,
-                  label: "Product Rating",
-                  menuKey: "productRating",
-                  to: "/app/productRating",
-                },
-{
-                  icon: <Home />,
-                  label: "Cart",
-                  menuKey: "cart",
-                  to: "/app/cart",
-                },
-{
-                  icon: <Home />,
-                  label: "Cart Items",
-                  menuKey: "cartItems",
-                  to: "/app/cartItems",
-                },
-{
-                  icon: <Home />,
-                  label: "Checkout",
-                  menuKey: "checkout",
-                  to: "/app/checkout",
-                },
-{
-                  icon: <Home />,
-                  label: "Customers",
-                  menuKey: "customerDetails",
-                  to: "/app/customerDetails",
-                },
-{
-                  icon: <Home />,
-                  label: "Customer Address",
-                  menuKey: "customerAddress",
-                  to: "/app/customerAddress",
-                },
-{
-                  icon: <Home />,
-                  label: "Order",
-                  menuKey: "order",
-                  to: "/app/order",
-                },
-{
-                  icon: <Home />,
-                  label: "Items",
-                  menuKey: "items",
-                  to: "/app/items",
-                },
-{
-                  icon: <Home />,
-                  label: "Order Product",
-                  menuKey: "orderProduct",
-                  to: "/app/orderProduct",
-                },
-{
-                  icon: <Home />,
-                  label: "Order History",
-                  menuKey: "orderHistory",
-                  to: "/app/orderHistory",
-                },
-{
-                  icon: <Home />,
-                  label: "User Details",
-                  menuKey: "userDetails",
-                  to: "/app/userDetails",
-                },
+                    {
+                      icon: <Home />,
+                      label: "Category",
+                      menuKey: "category",
+                      to: "/app/category",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Product",
+                      menuKey: "product",
+                      to: "/app/product",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Product Color",
+                      menuKey: "productColor",
+                      to: "/app/productColor",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Product Price",
+                      menuKey: "productPrice",
+                      to: "/app/productPrice",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Product Size",
+                      menuKey: "productSize",
+                      to: "/app/productSize",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Product Rating",
+                      menuKey: "productRating",
+                      to: "/app/productRating",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Cart",
+                      menuKey: "cart",
+                      to: "/app/cart",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Cart Items",
+                      menuKey: "cartItems",
+                      to: "/app/cartItems",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Checkout",
+                      menuKey: "checkout",
+                      to: "/app/checkout",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Customers",
+                      menuKey: "customerDetails",
+                      to: "/app/customerDetails",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Customer Address",
+                      menuKey: "customerAddress",
+                      to: "/app/customerAddress",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Order",
+                      menuKey: "order",
+                      to: "/app/order",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Items",
+                      menuKey: "items",
+                      to: "/app/items",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Order Product",
+                      menuKey: "orderProduct",
+                      to: "/app/orderProduct",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "Order History",
+                      menuKey: "orderHistory",
+                      to: "/app/orderHistory",
+                    },
+                    {
+                      icon: <Home />,
+                      label: "User Details",
+                      menuKey: "userDetails",
+                      to: "/app/userDetails",
+                    },
                     /* ~cb-add-menu~ */
                   ]}
                 />

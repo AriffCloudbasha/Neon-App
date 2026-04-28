@@ -552,7 +552,7 @@ const AppTopbar = (props) => {
           <Link to="/project">
             <div className="cursor-pointer flex align-items-end">
               <img
-                src={"./assets/logo/cb-logo-256.png"}
+                src={"/lightning/android-chrome-512x512.png"}
                 height={50}
                 className="mt-0"
                 alt="Logo"
@@ -568,7 +568,7 @@ const AppTopbar = (props) => {
                 }}
               >
                 <i className="pi pi-menu" style={{ fontSize: "1.5rem" }}></i>{" "}
-                {label !== "" ? label : "CB App"}
+                {label ? label : "CB App"}
               </h3>
             </div>
           </Link>

@@ -107,7 +107,7 @@ const SignUpPage = (props) => {
     } catch (err) {
       console.log(err);
     }
-    
+
     // Remove invitation check - always create or get invite record
     if (!loginEmailData || loginEmailData?.data?.length === 0) {
       // No record exists, so create a new one with a generated code.

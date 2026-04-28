@@ -1,13 +1,13 @@
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
-import React, { useState, useRef, useEffect} from 'react';
-import _ from 'lodash';
-import { Button } from 'primereact/button';
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
+import React, { useState, useRef, useEffect } from "react";
+import _ from "lodash";
+import { Button } from "primereact/button";
 
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import UploadService from "../../../services/UploadService";
-import { InputText } from 'primereact/inputtext';
+import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { MultiSelect } from "primereact/multiselect";
 import DownloadCSV from "../../../utils/DownloadCSV";
@@ -19,15 +19,35 @@ import DuplicateIcon from "../../../assets/media/Duplicate.png";
 import DeleteIcon from "../../../assets/media/Trash.png";
 import { Checkbox } from "primereact/checkbox";
 
-const CheckoutDataTable = ({ items, fields, onEditRow, onRowDelete, onRowClick, searchDialog, setSearchDialog,   showUpload, setShowUpload,
-    showFilter, setShowFilter,
-    showColumns, setShowColumns, onClickSaveFilteredfields ,
-    selectedFilterFields, setSelectedFilterFields,
-    selectedHideFields, setSelectedHideFields, onClickSaveHiddenfields, loading, user,   selectedDelete,
-  setSelectedDelete, onCreateResult}) => {
-    const dt = useRef(null);
-    const urlParams = useParams();
-    const [globalFilter, setGlobalFilter] = useState('');
+const CheckoutDataTable = ({
+  items,
+  fields,
+  onEditRow,
+  onRowDelete,
+  onRowClick,
+  searchDialog,
+  setSearchDialog,
+  showUpload,
+  setShowUpload,
+  showFilter,
+  setShowFilter,
+  showColumns,
+  setShowColumns,
+  onClickSaveFilteredfields,
+  selectedFilterFields,
+  setSelectedFilterFields,
+  selectedHideFields,
+  setSelectedHideFields,
+  onClickSaveHiddenfields,
+  loading,
+  user,
+  selectedDelete,
+  setSelectedDelete,
+  onCreateResult,
+}) => {
+  const dt = useRef(null);
+  const urlParams = useParams();
+  const [globalFilter, setGlobalFilter] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
   const [showDialog, setShowDialog] = useState(false);
   const [data, setData] = useState([]);
@@ -53,14 +73,36 @@ const CheckoutDataTable = ({ items, fields, onEditRow, onRowDelete, onRowClick, 
     </div>
   );
 
-const pTemplate0 = (rowData, { rowIndex }) => <p >{rowData.orderNumber}</p>
-const dropdownTemplate1 = (rowData, { rowIndex }) => <p >{rowData.customer?.customers}</p>
-const tickTemplate2 = (rowData, { rowIndex }) => <i className={`pi ${rowData.paymentStatus?"pi-check": "pi-times"}`}  ></i>
-const pTemplate3 = (rowData, { rowIndex }) => <p >{rowData.paymentMethod}</p>
-    const editTemplate = (rowData, { rowIndex }) => <Button onClick={() => onEditRow(rowData, rowIndex)} icon={`pi ${rowData.isEdit ? "pi-check" : "pi-pencil"}`} className={`p-button-rounded p-button-text ${rowData.isEdit ? "p-button-success" : "p-button-warning"}`} />;
-    const deleteTemplate = (rowData, { rowIndex }) => <Button onClick={() => onRowDelete(rowData._id)} icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" />;
-    
-      const checkboxTemplate = (rowData) => (
+  const pTemplate0 = (rowData, { rowIndex }) => <p>{rowData.orderNumber}</p>;
+  const dropdownTemplate1 = (rowData, { rowIndex }) => (
+    <p>{rowData.customer?.customers}</p>
+  );
+  const tickTemplate2 = (rowData, { rowIndex }) => (
+    <p className="m-0 ml-7">
+      <i
+        className={`pi ${rowData.paymentStatus ? "pi-check" : "pi-times"}`}
+      ></i>
+    </p>
+  );
+  const pTemplate3 = (rowData, { rowIndex }) => (
+    <p className="m-0 ml-4">{rowData.paymentMethod}</p>
+  );
+  const editTemplate = (rowData, { rowIndex }) => (
+    <Button
+      onClick={() => onEditRow(rowData, rowIndex)}
+      icon={`pi ${rowData.isEdit ? "pi-check" : "pi-pencil"}`}
+      className={`p-button-rounded p-button-text ${rowData.isEdit ? "p-button-success" : "p-button-warning"}`}
+    />
+  );
+  const deleteTemplate = (rowData, { rowIndex }) => (
+    <Button
+      onClick={() => onRowDelete(rowData._id)}
+      icon="pi pi-times"
+      className="p-button-rounded p-button-danger p-button-text"
+    />
+  );
+
+  const checkboxTemplate = (rowData) => (
     <Checkbox
       checked={selectedItems.some((item) => item._id === rowData._id)}
       onChange={(e) => {
@@ -101,7 +143,7 @@ const pTemplate3 = (rowData, { rowIndex }) => <p >{rowData.paymentMethod}</p>
       console.error("Failed to delete selected records", error);
     }
   };
-    
+
   const handleMessage = () => {
     setShowDialog(true); // Open the dialog
   };
@@ -110,10 +152,10 @@ const pTemplate3 = (rowData, { rowIndex }) => <p >{rowData.paymentMethod}</p>
     setShowDialog(false); // Close the dialog
   };
 
-    return (
-        <>
-        <DataTable 
-           value={items}
+  return (
+    <>
+      <DataTable
+        value={items}
         ref={dt}
         removableSort
         onRowClick={onRowClick}
@@ -133,21 +175,49 @@ const pTemplate3 = (rowData, { rowIndex }) => <p >{rowData.paymentMethod}</p>
         onCreateResult={onCreateResult}
         globalFilter={globalFilter}
         header={header}
-        >
-                <Column
+      >
+        <Column
           selectionMode="multiple"
           headerStyle={{ width: "3rem" }}
           body={checkboxTemplate}
         />
-<Column field="orderNumber" header="Order Number" body={pTemplate0} filter={selectedFilterFields.includes("orderNumber")} hidden={selectedHideFields?.includes("orderNumber")}  sortable style={{ minWidth: "8rem" }} />
-<Column field="customer" header="Customer" body={dropdownTemplate1} filter={selectedFilterFields.includes("customer")} hidden={selectedHideFields?.includes("customer")}  style={{ minWidth: "8rem" }} />
-<Column field="paymentStatus" header="Payment Status" body={tickTemplate2} filter={selectedFilterFields.includes("paymentStatus")} hidden={selectedHideFields?.includes("paymentStatus")}  style={{ minWidth: "8rem" }} />
-<Column field="paymentMethod" header="Payment Method" body={pTemplate3} filter={selectedFilterFields.includes("paymentMethod")} hidden={selectedHideFields?.includes("paymentMethod")}  sortable style={{ minWidth: "8rem" }} />
-            <Column header="Edit" body={editTemplate} />
-            <Column header="Delete" body={deleteTemplate} />
-            
-        </DataTable>
-
+        <Column
+          field="orderNumber"
+          header="Order Number"
+          body={pTemplate0}
+          filter={selectedFilterFields.includes("orderNumber")}
+          hidden={selectedHideFields?.includes("orderNumber")}
+          sortable
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="customer"
+          header="Customer"
+          body={dropdownTemplate1}
+          filter={selectedFilterFields.includes("customer")}
+          hidden={selectedHideFields?.includes("customer")}
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="paymentStatus"
+          header="Payment Status"
+          body={tickTemplate2}
+          filter={selectedFilterFields.includes("paymentStatus")}
+          hidden={selectedHideFields?.includes("paymentStatus")}
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="paymentMethod"
+          header="Payment Method"
+          body={pTemplate3}
+          filter={selectedFilterFields.includes("paymentMethod")}
+          hidden={selectedHideFields?.includes("paymentMethod")}
+          sortable
+          style={{ minWidth: "8rem" }}
+        />
+        <Column header="Edit" body={editTemplate} />
+        <Column header="Delete" body={deleteTemplate} />
+      </DataTable>
 
       {selectedItems.length > 0 ? (
         <div
@@ -323,19 +393,27 @@ const pTemplate3 = (rowData, { rowIndex }) => <p >{rowData.paymentMethod}</p>
         </div>
       ) : null}
 
-
-        <Dialog header="Upload Checkout Data" visible={showUpload} onHide={() => setShowUpload(false)}>
-        <UploadService 
-          user={user} 
-          serviceName="checkout"            
+      <Dialog
+        header="Upload Checkout Data"
+        visible={showUpload}
+        onHide={() => setShowUpload(false)}
+      >
+        <UploadService
+          user={user}
+          serviceName="checkout"
           onUploadComplete={() => {
             setShowUpload(false); // Close the dialog after upload
-          }}/>
+          }}
+        />
       </Dialog>
 
-      <Dialog header="Search Checkout" visible={searchDialog} onHide={() => setSearchDialog(false)}>
-      Search
-    </Dialog>
+      <Dialog
+        header="Search Checkout"
+        visible={searchDialog}
+        onHide={() => setSearchDialog(false)}
+      >
+        Search
+      </Dialog>
       <Dialog
         header="Hide Columns"
         visible={showColumns}
@@ -361,12 +439,12 @@ const pTemplate3 = (rowData, { rowIndex }) => <p >{rowData.paymentMethod}</p>
             console.log(selectedHideFields);
             onClickSaveHiddenfields(selectedHideFields);
             setSelectedHideFields(selectedHideFields);
-            setShowColumns(false)
+            setShowColumns(false);
           }}
         ></Button>
       </Dialog>
-        </>
-    );
+    </>
+  );
 };
 
 export default CheckoutDataTable;

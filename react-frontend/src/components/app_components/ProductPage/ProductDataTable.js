@@ -1,12 +1,12 @@
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
-import React, { useState, useRef, useEffect} from 'react';
-import _ from 'lodash';
-import { Button } from 'primereact/button';
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
+import React, { useState, useRef, useEffect } from "react";
+import _ from "lodash";
+import { Button } from "primereact/button";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import UploadService from "../../../services/UploadService";
-import { InputText } from 'primereact/inputtext';
+import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { MultiSelect } from "primereact/multiselect";
 import DownloadCSV from "../../../utils/DownloadCSV";
@@ -18,15 +18,35 @@ import DuplicateIcon from "../../../assets/media/Duplicate.png";
 import DeleteIcon from "../../../assets/media/Trash.png";
 import { Checkbox } from "primereact/checkbox";
 
-const ProductDataTable = ({ items, fields, onEditRow, onRowDelete, onRowClick, searchDialog, setSearchDialog,   showUpload, setShowUpload,
-    showFilter, setShowFilter,
-    showColumns, setShowColumns, onClickSaveFilteredfields ,
-    selectedFilterFields, setSelectedFilterFields,
-    selectedHideFields, setSelectedHideFields, onClickSaveHiddenfields, loading, user,   selectedDelete,
-  setSelectedDelete, onCreateResult}) => {
-    const dt = useRef(null);
-    const urlParams = useParams();
-    const [globalFilter, setGlobalFilter] = useState('');
+const ProductDataTable = ({
+  items,
+  fields,
+  onEditRow,
+  onRowDelete,
+  onRowClick,
+  searchDialog,
+  setSearchDialog,
+  showUpload,
+  setShowUpload,
+  showFilter,
+  setShowFilter,
+  showColumns,
+  setShowColumns,
+  onClickSaveFilteredfields,
+  selectedFilterFields,
+  setSelectedFilterFields,
+  selectedHideFields,
+  setSelectedHideFields,
+  onClickSaveHiddenfields,
+  loading,
+  user,
+  selectedDelete,
+  setSelectedDelete,
+  onCreateResult,
+}) => {
+  const dt = useRef(null);
+  const urlParams = useParams();
+  const [globalFilter, setGlobalFilter] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
   const [showDialog, setShowDialog] = useState(false);
   const [data, setData] = useState([]);
@@ -52,20 +72,61 @@ const ProductDataTable = ({ items, fields, onEditRow, onRowDelete, onRowClick, s
     </div>
   );
 
-const pTemplate0 = (rowData, { rowIndex }) => <p >{rowData.productTitle}</p>
-const inputTextareaTemplate1 = (rowData, { rowIndex }) => <p >{rowData.description}</p>
-const multiselectTemplate2 = (rowData, { rowIndex }) => <p>{Object.entries(rowData.productColour)?.filter(([key, value]) => key !== '_id')?.map(([key, value]) => `${key}: ${value}`).join(', ')}</p>
-const dropdownTemplate3 = (rowData, { rowIndex }) => <p >{rowData.productPrice?.basePrice}</p>
-const dropdownTemplate4 = (rowData, { rowIndex }) => <p>{Object.entries(rowData.productSize)?.filter(([key, value]) => key !== '_id')?.map(([key, value]) => `${key}: ${value}`).join(', ')}</p>
-const dropdownTemplate5 = (rowData, { rowIndex }) => <p>{Object.entries(rowData.productRating)?.filter(([key, value]) => key !== '_id')?.map(([key, value]) => `${key}: ${value}`).join(', ')}</p>
-const dropdownTemplate6 = (rowData, { rowIndex }) => <p>{Object.entries(rowData.category)?.filter(([key, value]) => key !== '_id')?.map(([key, value]) => `${key}: ${value}`).join(', ')}</p>
-const pTemplate7 = (rowData, { rowIndex }) => <p >{rowData.sku}</p>
-const file_uploadTemplate8 = (rowData, { rowIndex }) => <div  > </div>
-const file_uploadTemplate9 = (rowData, { rowIndex }) => <div  > </div>
-    const editTemplate = (rowData, { rowIndex }) => <Button onClick={() => onEditRow(rowData, rowIndex)} icon={`pi ${rowData.isEdit ? "pi-check" : "pi-pencil"}`} className={`p-button-rounded p-button-text ${rowData.isEdit ? "p-button-success" : "p-button-warning"}`} />;
-    const deleteTemplate = (rowData, { rowIndex }) => <Button onClick={() => onRowDelete(rowData._id)} icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" />;
-    
-      const checkboxTemplate = (rowData) => (
+  const pTemplate0 = (rowData, { rowIndex }) => <p>{rowData.productTitle}</p>;
+  const inputTextareaTemplate1 = (rowData, { rowIndex }) => (
+    <p>{rowData.description}</p>
+  );
+  const multiselectTemplate2 = (rowData, { rowIndex }) => (
+    <p className="m-0 ml-6">
+      {Array.isArray(rowData.productColour)
+        ? rowData.productColour.map((item) => item.colorName).join(", ")
+        : rowData.productColour?.colorName || ""}
+    </p>
+  );
+  const dropdownTemplate3 = (rowData, { rowIndex }) => (
+    <p className="m-0 ml-5">{rowData.productPrice?.basePrice}</p>
+  );
+  const dropdownTemplate4 = (rowData, { rowIndex }) => (
+    <p className="m-0 ml-6">
+      {Array.isArray(rowData.productSize)
+        ? rowData.productSize.map((item) => item.sizeCategory).join(", ")
+        : rowData.productSize?.sizeCategory || ""}
+    </p>
+  );
+  const dropdownTemplate5 = (rowData, { rowIndex }) => (
+    <p className="m-0 ml-6">
+      {Array.isArray(rowData.productRating)
+        ? rowData.productRating.map((item) => item.starRating).join(", ")
+        : rowData.productRating?.starRating || ""}
+    </p>
+  );
+  const dropdownTemplate6 = (rowData, { rowIndex }) => (
+    <p>
+      {Object.entries(rowData.category)
+        ?.filter(([key, value]) => key !== "_id")
+        ?.map(([key, value]) => `${key}: ${value}`)
+        .join(", ")}
+    </p>
+  );
+  const pTemplate7 = (rowData, { rowIndex }) => <p>{rowData.sku}</p>;
+  const file_uploadTemplate8 = (rowData, { rowIndex }) => <div> </div>;
+  const file_uploadTemplate9 = (rowData, { rowIndex }) => <div> </div>;
+  const editTemplate = (rowData, { rowIndex }) => (
+    <Button
+      onClick={() => onEditRow(rowData, rowIndex)}
+      icon={`pi ${rowData.isEdit ? "pi-check" : "pi-pencil"}`}
+      className={`p-button-rounded p-button-text ${rowData.isEdit ? "p-button-success" : "p-button-warning"}`}
+    />
+  );
+  const deleteTemplate = (rowData, { rowIndex }) => (
+    <Button
+      onClick={() => onRowDelete(rowData._id)}
+      icon="pi pi-times"
+      className="p-button-rounded p-button-danger p-button-text"
+    />
+  );
+
+  const checkboxTemplate = (rowData) => (
     <Checkbox
       checked={selectedItems.some((item) => item._id === rowData._id)}
       onChange={(e) => {
@@ -106,7 +167,7 @@ const file_uploadTemplate9 = (rowData, { rowIndex }) => <div  > </div>
       console.error("Failed to delete selected records", error);
     }
   };
-    
+
   const handleMessage = () => {
     setShowDialog(true); // Open the dialog
   };
@@ -115,10 +176,10 @@ const file_uploadTemplate9 = (rowData, { rowIndex }) => <div  > </div>
     setShowDialog(false); // Close the dialog
   };
 
-    return (
-        <>
-        <DataTable 
-           value={items}
+  return (
+    <>
+      <DataTable
+        value={items}
         ref={dt}
         removableSort
         onRowClick={onRowClick}
@@ -138,27 +199,101 @@ const file_uploadTemplate9 = (rowData, { rowIndex }) => <div  > </div>
         onCreateResult={onCreateResult}
         globalFilter={globalFilter}
         header={header}
-        >
-                <Column
+      >
+        <Column
           selectionMode="multiple"
           headerStyle={{ width: "3rem" }}
           body={checkboxTemplate}
         />
-<Column field="productTitle" header="Product Title" body={pTemplate0} filter={selectedFilterFields.includes("productTitle")} hidden={selectedHideFields?.includes("productTitle")}  sortable style={{ minWidth: "8rem" }} />
-<Column field="description" header="Description" body={inputTextareaTemplate1} filter={selectedFilterFields.includes("description")} hidden={selectedHideFields?.includes("description")}  sortable style={{ minWidth: "8rem" }} />
-<Column field="productColour" header="Product Colour" body={multiselectTemplate2} filter={selectedFilterFields.includes("productColour")} hidden={selectedHideFields?.includes("productColour")}  style={{ minWidth: "8rem" }} />
-<Column field="productPrice" header="Product Price" body={dropdownTemplate3} filter={selectedFilterFields.includes("productPrice")} hidden={selectedHideFields?.includes("productPrice")}  style={{ minWidth: "8rem" }} />
-<Column field="productSize" header="Product Size" body={dropdownTemplate4} filter={selectedFilterFields.includes("productSize")} hidden={selectedHideFields?.includes("productSize")}  style={{ minWidth: "8rem" }} />
-<Column field="productRating" header="Product Rating" body={dropdownTemplate5} filter={selectedFilterFields.includes("productRating")} hidden={selectedHideFields?.includes("productRating")}  style={{ minWidth: "8rem" }} />
-<Column field="category" header="Category" body={dropdownTemplate6} filter={selectedFilterFields.includes("category")} hidden={selectedHideFields?.includes("category")}  style={{ minWidth: "8rem" }} />
-<Column field="sku" header="sku" body={pTemplate7} filter={selectedFilterFields.includes("sku")} hidden={selectedHideFields?.includes("sku")}  sortable style={{ minWidth: "8rem" }} />
-<Column field="productImage" header="Product Image" body={file_uploadTemplate8} filter={selectedFilterFields.includes("productImage")} hidden={selectedHideFields?.includes("productImage")}  sortable style={{ minWidth: "8rem" }} />
-<Column field="smallImage" header="Small Image" body={file_uploadTemplate9} filter={selectedFilterFields.includes("smallImage")} hidden={selectedHideFields?.includes("smallImage")}  sortable style={{ minWidth: "8rem" }} />
-            <Column header="Edit" body={editTemplate} />
-            <Column header="Delete" body={deleteTemplate} />
-            
-        </DataTable>
-
+        <Column
+          field="productTitle"
+          header="Product Title"
+          body={pTemplate0}
+          filter={selectedFilterFields.includes("productTitle")}
+          hidden={selectedHideFields?.includes("productTitle")}
+          sortable
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="description"
+          header="Description"
+          body={inputTextareaTemplate1}
+          filter={selectedFilterFields.includes("description")}
+          hidden={selectedHideFields?.includes("description")}
+          sortable
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="productColour"
+          header="Product Colour"
+          body={multiselectTemplate2}
+          filter={selectedFilterFields.includes("productColour")}
+          hidden={selectedHideFields?.includes("productColour")}
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="productPrice"
+          header="Product Price"
+          body={dropdownTemplate3}
+          filter={selectedFilterFields.includes("productPrice")}
+          hidden={selectedHideFields?.includes("productPrice")}
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="productSize"
+          header="Product Size"
+          body={dropdownTemplate4}
+          filter={selectedFilterFields.includes("productSize")}
+          hidden={selectedHideFields?.includes("productSize")}
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="productRating"
+          header="Product Rating"
+          body={dropdownTemplate5}
+          filter={selectedFilterFields.includes("productRating")}
+          hidden={selectedHideFields?.includes("productRating")}
+          style={{ minWidth: "8rem" }}
+          headerStyle={{ textAlign: "center" }}
+        />
+        <Column
+          field="category"
+          header="Category"
+          body={dropdownTemplate6}
+          filter={selectedFilterFields.includes("category")}
+          hidden={selectedHideFields?.includes("category")}
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="sku"
+          header="sku"
+          body={pTemplate7}
+          filter={selectedFilterFields.includes("sku")}
+          hidden={selectedHideFields?.includes("sku")}
+          sortable
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="productImage"
+          header="Product Image"
+          body={file_uploadTemplate8}
+          filter={selectedFilterFields.includes("productImage")}
+          hidden={selectedHideFields?.includes("productImage")}
+          sortable
+          style={{ minWidth: "8rem" }}
+        />
+        <Column
+          field="smallImage"
+          header="Small Image"
+          body={file_uploadTemplate9}
+          filter={selectedFilterFields.includes("smallImage")}
+          hidden={selectedHideFields?.includes("smallImage")}
+          sortable
+          style={{ minWidth: "8rem" }}
+        />
+        <Column header="Edit" body={editTemplate} />
+        <Column header="Delete" body={deleteTemplate} />
+      </DataTable>
 
       {selectedItems.length > 0 ? (
         <div
@@ -334,19 +469,27 @@ const file_uploadTemplate9 = (rowData, { rowIndex }) => <div  > </div>
         </div>
       ) : null}
 
-
-        <Dialog header="Upload Product Data" visible={showUpload} onHide={() => setShowUpload(false)}>
-        <UploadService 
-          user={user} 
-          serviceName="product"            
+      <Dialog
+        header="Upload Product Data"
+        visible={showUpload}
+        onHide={() => setShowUpload(false)}
+      >
+        <UploadService
+          user={user}
+          serviceName="product"
           onUploadComplete={() => {
             setShowUpload(false); // Close the dialog after upload
-          }}/>
+          }}
+        />
       </Dialog>
 
-      <Dialog header="Search Product" visible={searchDialog} onHide={() => setSearchDialog(false)}>
-      Search
-    </Dialog>
+      <Dialog
+        header="Search Product"
+        visible={searchDialog}
+        onHide={() => setSearchDialog(false)}
+      >
+        Search
+      </Dialog>
       <Dialog
         header="Hide Columns"
         visible={showColumns}
@@ -372,12 +515,12 @@ const file_uploadTemplate9 = (rowData, { rowIndex }) => <div  > </div>
             console.log(selectedHideFields);
             onClickSaveHiddenfields(selectedHideFields);
             setSelectedHideFields(selectedHideFields);
-            setShowColumns(false)
+            setShowColumns(false);
           }}
         ></Button>
       </Dialog>
-        </>
-    );
+    </>
+  );
 };
 
 export default ProductDataTable;

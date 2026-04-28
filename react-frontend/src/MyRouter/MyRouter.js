@@ -15,6 +15,7 @@ import Account from '../components/cb_components/Account/Account';
 import CBRouter from './CBRouter';
 import AppRouter from './AppRouter';
 import '../assets/mainTheme/modal.css';
+import WebRouter from './WebRouter/WebRouter';
 
 //  ~cb-add-import~
 
@@ -54,21 +55,7 @@ const MyRouter = (props) => {
 
     return (
         <Routes>
-            <Route
-                path="/"
-                exact
-                element={
-                    props.isLoggedIn ? (
-                        <div className="flex min-h-[calc(100vh-5rem)] bg-white mt-20">
-                            <ProjectSideBarLayout>
-                                <DashboardWelcome />
-                            </ProjectSideBarLayout>
-                        </div>
-                    ) : (
-                        <LoginPage />
-                    )
-                }
-            />
+            <Route path="/" exact element={<WebRouter />} />
             <Route
                 path="/login"
                 exact
@@ -88,6 +75,7 @@ const MyRouter = (props) => {
             <Route path="/signup" exact element={<SignUpPage />} />
             <Route path="/maintenance" exact element={<MaintenancePage />} />
             <Route path="/login-faq" exact element={<LoginFaqPage />} />
+            <Route path="/*" exact element={<WebRouter />} />
 
             <Route element={<ProtectedRoute redirectPath={'/login'} />}>
                 <Route path="/project" exact element={<DashboardWelcome />} />

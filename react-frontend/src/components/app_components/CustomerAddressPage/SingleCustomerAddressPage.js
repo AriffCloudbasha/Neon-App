@@ -12,42 +12,49 @@ import ProjectLayout from "../../Layouts/ProjectLayout";
 import CustomerDetailsPage from "../CustomerDetailsPage/CustomerDetailsPage";
 
 const SingleCustomerAddressPage = (props) => {
-    const navigate = useNavigate();
-    const urlParams = useParams();
-    const [_entity, set_entity] = useState({});
+  const navigate = useNavigate();
+  const urlParams = useParams();
+  const [_entity, set_entity] = useState({});
   const [isHelpSidebarVisible, setHelpSidebarVisible] = useState(false);
 
-    
+  useEffect(() => {
+    //on mount
+    client
+      .service("customerAddress")
+      .get(urlParams.singleCustomerAddressId, {
+        query: {
+          $populate: [
+            {
+              path: "createdBy",
+              service: "users",
+              select: ["name"],
+            },
+            {
+              path: "updatedBy",
+              service: "users",
+              select: ["name"],
+            },
+          ],
+        },
+      })
+      .then((res) => {
+        set_entity(res || {});
+      })
+      .catch((error) => {
+        console.log({ error });
+        props.alert({
+          title: "CustomerAddress",
+          type: "error",
+          message: error.message || "Failed get customerAddress",
+        });
+      });
+  }, [props, urlParams.singleCustomerAddressId]);
 
-    useEffect(() => {
-        //on mount
-        client
-            .service("customerAddress")
-            .get(urlParams.singleCustomerAddressId, { query: { $populate: [            {
-                path: "createdBy",
-                service: "users",
-                select: ["name"],
-              },{
-                path: "updatedBy",
-                service: "users",
-                select: ["name"],
-              },] }})
-            .then((res) => {
-                set_entity(res || {});
-                
-            })
-            .catch((error) => {
-                console.log({ error });
-                props.alert({ title: "CustomerAddress", type: "error", message: error.message || "Failed get customerAddress" });
-            });
-    }, [props,urlParams.singleCustomerAddressId]);
+  const goBack = () => {
+    navigate("/app/customerAddress");
+  };
 
-
-    const goBack = () => {
-        navigate("/app/customerAddress");
-    };
-
-      const toggleHelpSidebar = () => {
+  const toggleHelpSidebar = () => {
     setHelpSidebarVisible(!isHelpSidebarVisible);
   };
 
@@ -73,95 +80,117 @@ const SingleCustomerAddressPage = (props) => {
       });
   };
 
-    const menuItems = [
-        {
-            label: "Copy link",
-            icon: "pi pi-copy",
-            command: () => copyPageLink(),
-        },
-        {
-            label: "Help",
-            icon: "pi pi-question-circle",
-            command: () => toggleHelpSidebar(),
-        },
-    ];
+  const menuItems = [
+    {
+      label: "Copy link",
+      icon: "pi pi-copy",
+      command: () => copyPageLink(),
+    },
+    {
+      label: "Help",
+      icon: "pi pi-question-circle",
+      command: () => toggleHelpSidebar(),
+    },
+  ];
 
-    return (
-        <ProjectLayout>
-        <div className="col-12 flex flex-column align-items-center">
-            <div className="col-12">
-                <div className="flex align-items-center justify-content-between">
-                <div className="flex align-items-center">
-                    <Button className="p-button-text" icon="pi pi-chevron-left" onClick={() => goBack()} />
-                    <h3 className="m-0">Customer Address</h3>
-                    <SplitButton
-                        model={menuItems.filter(
-                        (m) => !(m.icon === "pi pi-trash" && items?.length === 0),
-                        )}
-                        dropdownIcon="pi pi-ellipsis-h"
-                        buttonClassName="hidden"
-                        menuButtonClassName="ml-1 p-button-text"
-                    />
-                </div>
-                
-                {/* <p>customerAddress/{urlParams.singleCustomerAddressId}</p> */}
+  return (
+    <ProjectLayout>
+      <div className="col-12 flex flex-column align-items-center">
+        <div className="col-12">
+          <div className="flex align-items-center justify-content-between">
+            <div className="flex align-items-center">
+              <Button
+                className="p-button-text"
+                icon="pi pi-chevron-left"
+                onClick={() => goBack()}
+              />
+              <h3 className="m-0">Customer Address</h3>
+              <SplitButton
+                model={menuItems.filter(
+                  (m) => !(m.icon === "pi pi-trash" && items?.length === 0),
+                )}
+                dropdownIcon="pi pi-ellipsis-h"
+                buttonClassName="hidden"
+                menuButtonClassName="ml-1 p-button-text"
+              />
             </div>
-            <div className="card w-full">
-                <div className="grid ">
 
-            <div className="col-12 md:col-6 lg:col-3"><label className="text-sm text-gray-600">Address Type</label><p className="m-0 ml-3" >{_entity?.addressType}</p></div>
-<div className="col-12 md:col-6 lg:col-3"><label className="text-sm text-gray-600">Country</label><p className="m-0 ml-3" >{_entity?.country}</p></div>
-<div className="col-12 md:col-6 lg:col-3"><label className="text-sm text-gray-600">Address Line1</label><p className="m-0 ml-3" >{_entity?.addressLine1}</p></div>
-<div className="col-12 md:col-6 lg:col-3"><label className="text-sm text-gray-600">Address Line2</label><p className="m-0 ml-3" >{_entity?.addressLine2}</p></div>
-<div className="col-12 md:col-6 lg:col-3"><label className="text-sm text-gray-600">City</label><p className="m-0 ml-3" >{_entity?.city}</p></div>
-<div className="col-12 md:col-6 lg:col-3"><label className="text-sm text-gray-600">Postal Code</label><p className="m-0 ml-3" >{Number(_entity?.postalCode)}</p></div>
-            
+            {/* <p>customerAddress/{urlParams.singleCustomerAddressId}</p> */}
+          </div>
+          <div className="card w-full">
+            <div className="grid ">
+              <div className="col-12 md:col-6 lg:col-3">
+                <label className="text-sm text-gray-600">Address Type</label>
+                <p className="m-0 ml-3">{_entity?.addressType}</p>
+              </div>
+              <div className="col-12 md:col-6 lg:col-3">
+                <label className="text-sm text-gray-600">Country</label>
+                <p className="m-0 ml-3">{_entity?.country}</p>
+              </div>
+              <div className="col-12 md:col-6 lg:col-3">
+                <label className="text-sm text-gray-600">Address Line1</label>
+                <p className="m-0 ml-3">{_entity?.addressLine1}</p>
+              </div>
+              <div className="col-12 md:col-6 lg:col-3">
+                <label className="text-sm text-gray-600">Address Line2</label>
+                <p className="m-0 ml-3">{_entity?.addressLine2}</p>
+              </div>
+              <div className="col-12 md:col-6 lg:col-3">
+                <label className="text-sm text-gray-600">City</label>
+                <p className="m-0 ml-3">{_entity?.city}</p>
+              </div>
+              <div className="col-12 md:col-6 lg:col-3">
+                <label className="text-sm text-gray-600">Postal Code</label>
+                <p className="m-0 ml-3">{Number(_entity?.postalCode)}</p>
+              </div>
 
-                    <div className="col-12">&nbsp;</div>
-                </div>
+              <div className="col-12">&nbsp;</div>
             </div>
-         </div>
+          </div>
+        </div>
 
-      
-    <div className="col-12 mt-2">
-        <TabView>
-        
-                    <TabPanel header="Customer Details" leftIcon="pi pi-building-columns mr-2">
-                        <CustomerDetailsPage/>
-                    </TabPanel>
-                    
-        </TabView>
-    </div>
+        <div className="col-12 mt-2">
+          <TabView>
+            <TabPanel
+              header="Customer Details"
+              leftIcon="pi pi-building-columns mr-2"
+            >
+              <CustomerDetailsPage />
+            </TabPanel>
+          </TabView>
+        </div>
 
-
-      <CommentsSection
-        recordId={urlParams.singleCustomerAddressId}
-        user={props.user}
-        alert={props.alert}
-        serviceName="customerAddress"
-      />
-      <div
-        id="rightsidebar"
-        className={classNames("overlay-auto z-1 surface-overlay shadow-2 absolute right-0 w-20rem animation-duration-150 animation-ease-in-out", { "hidden" : !isHelpSidebarVisible })}
-        style={{ top: "60px", height: "calc(100% - 60px)" }}
-      >
-        <div className="flex flex-column h-full p-4">
-          <span className="text-xl font-medium text-900 mb-3">Help bar</span>
-          <div className="border-2 border-dashed surface-border border-round surface-section flex-auto"></div>
+        <CommentsSection
+          recordId={urlParams.singleCustomerAddressId}
+          user={props.user}
+          alert={props.alert}
+          serviceName="customerAddress"
+        />
+        <div
+          id="rightsidebar"
+          className={classNames(
+            "overlay-auto z-1 surface-overlay shadow-2 absolute right-0 w-20rem animation-duration-150 animation-ease-in-out",
+            { hidden: !isHelpSidebarVisible },
+          )}
+          style={{ top: "60px", height: "calc(100% - 60px)" }}
+        >
+          <div className="flex flex-column h-full p-4">
+            <span className="text-xl font-medium text-900 mb-3">Help bar</span>
+            <div className="border-2 border-dashed surface-border border-round surface-section flex-auto"></div>
+          </div>
         </div>
       </div>
-      </div>
-        </ProjectLayout>
-    );
+    </ProjectLayout>
+  );
 };
 
 const mapState = (state) => {
-    const { user, isLoggedIn } = state.auth;
-    return { user, isLoggedIn };
+  const { user, isLoggedIn } = state.auth;
+  return { user, isLoggedIn };
 };
 
 const mapDispatch = (dispatch) => ({
-    alert: (data) => dispatch.toast.alert(data),
+  alert: (data) => dispatch.toast.alert(data),
 });
 
 export default connect(mapState, mapDispatch)(SingleCustomerAddressPage);

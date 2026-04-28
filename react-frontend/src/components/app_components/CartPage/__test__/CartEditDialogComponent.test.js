@@ -9,13 +9,13 @@ import { Provider } from "react-redux";
 import * as models from "../../../models";
 
 test("renders cart edit dialog", async () => {
-    const store = init({ models });
-    render(
-        <Provider store={store}>
-            <MemoryRouter>
-                <CartEditDialogComponent show={true} />
-            </MemoryRouter>
-        </Provider>
-    );
-    expect(screen.getByRole("cart-edit-dialog-component")).toBeInTheDocument();
+  const store = init({ models });
+  render(
+    <Provider store={store}>
+      <MemoryRouter>
+        <CartEditDialogComponent show={true} />
+      </MemoryRouter>
+    </Provider>,
+  );
+  expect(screen.getByRole("cart-edit-dialog-component")).toBeInTheDocument();
 });

@@ -97,7 +97,17 @@ export const deleteMany = async (params) => {
     }
 };
 
-export const excludeLocations = ['/settings', '/account', '/', '/login-faq', '/signup', '/login', '/login-faq', /^\/reset\/[a-f0-9]{24}$/];
+// Website locations only - for the sidebar exclusion logic and for removing the sidebar from website
+export const excludeLocations = ['/', '/Homepage', '/login-faq', '/signup', '/login', '/product', '/category', '/order', '/checkout', '/cart', '/OrderHistory1', '/orderhistory1', /^\/reset\/[a-f0-9]{24}$/, /^\/product\/.*$/, /^\/category\/.*$/, /^\/categories\/.*$/, /^\/order\/.*$/, /^\/checkout\/.*$/, /^\/cart\/.*$/,/^\/web-login$/,/^\/OrderHistory1\/.*$/,/^\/orderhistory1\/.*$/i];
+
+// Check if current route is admin route (not website)
+export const isAdminRoute = (pathname) => {
+    // Admin routes are: /cbAdmin/*, /app/*, /project, /account
+    if (!pathname) return false;
+    
+    const adminRoutes = ['/cbAdmin', '/app', '/project', '/account'];
+    return adminRoutes.some(route => pathname.startsWith(route));
+};
 
 export default {
     requestOptions,
@@ -108,5 +118,5 @@ export default {
     getAllService,
     updateMany,
     deleteMany,
-    excludeLocations
+    excludeLocations,
 };
