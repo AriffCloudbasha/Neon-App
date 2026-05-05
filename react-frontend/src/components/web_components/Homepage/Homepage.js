@@ -1,34 +1,97 @@
-import React, { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useRef, useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { connect, useDispatch, useSelector } from "react-redux";
 import { StyleClass } from "primereact/styleclass";
 import { Ripple } from "primereact/ripple";
 import { Badge } from "primereact/badge";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
+import client from "../../../services/restClient";
 
-const HomePage = () => {
-  const btnRef1 = useRef(null);
-  const btnRef2 = useRef(null);
-  const btnRef3 = useRef(null);
-  const btnRef4 = useRef(null);
-  const btnRef5 = useRef(null);
-  const btnRef6 = useRef(null);
-  const btnRef7 = useRef(null);
-  const btnRef8 = useRef(null);
-  const btnRef9 = useRef(null);
-  const btnRef10 = useRef(null);
-  const btnRef11 = useRef(null);
-  const btnRef12 = useRef(null);
-  const btnRef13 = useRef(null);
-  const btnRef14 = useRef(null);
-  const btnRef15 = useRef(null);
-  const btnRef16 = useRef(null);
+const HomePage = (props) => {
   const navigate = useNavigate();
-  const [showSearch, setShowSearch] = useState(false);
+  const urlParams = useParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
-  const [favoritesQuery, setFavoritesQuery] = useState("");
+
+  useEffect(() => {
+    setLoading(true);
+    client
+      .service("products")
+      .find({
+        query: {
+          $limit: 10000,
+          productsColour: urlParams.singleProductColorId,
+          productsSize: urlParams.singleProductSizeId,
+          productsRating: urlParams.singleProductRatingId,
+          productsCategory: urlParams.singleProductCategoryId,
+          category: urlParams.singleProductCategoryId,
+          $populate: [
+            {
+              path: "createdBy",
+              service: "users",
+              select: ["name", "email"],
+            },
+            {
+              path: "updatedBy",
+              service: "users",
+              select: ["name"],
+            },
+            {
+              path: "productColour",
+              service: "product_color",
+              select: ["colorName", "colorCode"],
+            },
+            {
+              path: "productPrice",
+              service: "product_price",
+              select: ["basePrice"],
+            },
+            {
+              path: "productSize",
+              service: "product_size",
+              select: ["sizeCategory", "sizeValue"],
+            },
+            {
+              path: "productRating",
+              service: "product_rating",
+              select: ["starRating", "productName"],
+            },
+            {
+              path: "category",
+              service: "category",
+              select: ["type", "category", "gender", "isSale"],
+            },
+          ],
+        },
+      })
+      // Stores fetch product data in component
+      .then((res) => {
+        setData(res.data);
+        setLoading(false);
+      })
+      // handles error during API Call
+      .catch((error) => {
+        setLoading(false);
+        if (props.alert) {
+          props.alert({
+            title: "Product",
+            type: "error",
+            message: error.message || "Failed get Product",
+          });
+        }
+      });
+  }, []);
+  // handles search query and navigates to product page with search query as parameter
+  const onSearch = () => {
+    if (searchQuery.trim() !== "") {
+      navigate(`/product?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   return (
     <div className="surface-section">
@@ -47,62 +110,33 @@ const HomePage = () => {
         </a>
       </div>
       <div className="surface-overlay px-3 sm:px-7 flex flex-wrap align-items-stretch justify-content-between relative">
-        <StyleClass
-          nodeRef={btnRef1}
-          selector="#nav-2"
-          enterClassName="hidden"
-          leaveToClassName="hidden"
-          hideOnOutsideClick
-        >
-          <a
-            ref={btnRef1}
-            className="p-ripple cursor-pointer flex align-items-center lg:hidden text-700 mr-3"
-          >
-            <i className="pi pi-bars text-4xl"></i>
-            <Ripple />
-          </a>
-        </StyleClass>
+        {/* Navigation menu toggle removed btnRef1, StyleClass can be replaced with a simple button if needed */}
+        <a className="p-ripple cursor-pointer flex align-items-center lg:hidden text-700 mr-3">
+          <i className="pi pi-bars text-4xl"></i>
+          <Ripple />
+        </a>
         <div
           id="nav-2"
           className="surface-overlay hidden lg:flex absolute lg:static left-0 top-100 z-1 shadow-2 lg:shadow-none w-full lg:w-auto lg:flex-1 py-3 lg:py-0"
         >
           <ul className="list-none p-0 m-0 flex flex-column lg:flex-row">
             <li className="flex flex-column lg:flex-row">
-              <StyleClass
-                nodeRef={btnRef2}
-                selector="@next"
-                enterClassName="hidden"
-                leaveToClassName="hidden"
-                hideOnOutsideClick
+              <a
+                onClick={(e) => {
+                  if (window.innerWidth < 1024) navigate("/category");
+                }}
+                className="p-ripple font-medium inline-flex align-items-center cursor-pointer border-left-2 lg:border-left-none lg:border-bottom-2 border-transparent hover:border-primary
+          py-3 lg:py-0 px-6 lg:px-3 text-700 select-none text-xl lg:text-base lg:font-base w-full lg:w-auto"
               >
-                <a
-                  onClick={(e) => {
-                    if (window.innerWidth < 1024) navigate("/category");
-                  }}
-                  ref={btnRef2}
-                  className="p-ripple font-medium inline-flex align-items-center cursor-pointer border-left-2 lg:border-left-none lg:border-bottom-2 border-transparent hover:border-primary
-            py-3 lg:py-0 px-6 lg:px-3 text-700 select-none text-xl lg:text-base lg:font-base w-full lg:w-auto"
-                >
-                  <span>Women</span>
-                  <Ripple />
-                </a>
-              </StyleClass>
+                <span>Women</span>
+                <Ripple />
+              </a>
               <div className="surface-overlay shadow-none lg:shadow-2 hidden lg:absolute w-full left-0 top-100 pl-8 pr-6 lg:px-6 py-0 lg:py-6">
                 <div className="grid flex-wrap">
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef3}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef3}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Clothing
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Clothing
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -154,19 +188,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef4}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef4}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Shoes
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Shoes
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -212,19 +236,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef5}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef5}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Accessories
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Accessories
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -270,19 +284,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef6}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef6}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Beauty
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Beauty
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -337,41 +341,21 @@ const HomePage = () => {
               </div>
             </li>
             <li className="flex flex-column lg:flex-row">
-              <StyleClass
-                nodeRef={btnRef7}
-                selector="@next"
-                enterClassName="hidden"
-                leaveToClassName="hidden"
-                hideOnOutsideClick
+              <a
+                onClick={(e) => {
+                  if (window.innerWidth < 1024) navigate("/category");
+                }}
+                className="p-ripple font-medium inline-flex align-items-center cursor-pointer border-left-2 lg:border-left-none lg:border-bottom-2 border-transparent hover:border-primary py-3 lg:py-0 px-6 lg:px-3 text-700 select-none text-xl lg:text-base lg:font-base w-full lg:w-auto"
               >
-                <a
-                  onClick={(e) => {
-                    if (window.innerWidth < 1024) navigate("/category");
-                  }}
-                  ref={btnRef7}
-                  className="p-ripple font-medium inline-flex align-items-center cursor-pointer border-left-2 lg:border-left-none lg:border-bottom-2 border-transparent
-            hover:border-primary py-3 lg:py-0 px-6 lg:px-3 text-700 select-none text-xl lg:text-base lg:font-base w-full lg:w-auto"
-                >
-                  <span>Men</span>
-                  <Ripple />
-                </a>
-              </StyleClass>
+                <span>Men</span>
+                <Ripple />
+              </a>
               <div className="surface-overlay shadow-none lg:shadow-2 hidden lg:absolute w-full left-0 top-100 pl-8 pr-6 lg:px-6 py-0 lg:py-6 z-1">
                 <div className="grid flex-wrap">
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef9}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef9}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Clothing
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Clothing
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -417,19 +401,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef10}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef10}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Shoes
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Shoes
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -469,19 +443,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef11}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef11}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Accessories
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Accessories
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -521,19 +485,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef12}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef12}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Grooming
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Grooming
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -576,41 +530,21 @@ const HomePage = () => {
               </div>
             </li>
             <li className="flex flex-column lg:flex-row">
-              <StyleClass
-                nodeRef={btnRef8}
-                selector="@next"
-                enterClassName="hidden"
-                leaveToClassName="hidden"
-                hideOnOutsideClick
+              <a
+                onClick={(e) => {
+                  if (window.innerWidth < 1024) navigate("/category");
+                }}
+                className="p-ripple font-medium inline-flex align-items-center cursor-pointer border-left-2 lg:border-left-none lg:border-bottom-2 border-transparent hover:border-primary py-3 lg:py-0 px-6 lg:px-3 text-700 select-none text-xl lg:text-base lg:font-base w-full lg:w-auto"
               >
-                <a
-                  onClick={(e) => {
-                    if (window.innerWidth < 1024) navigate("/category");
-                  }}
-                  ref={btnRef8}
-                  className="p-ripple font-medium inline-flex align-items-center cursor-pointer border-left-2 lg:border-left-none lg:border-bottom-2 border-transparent
-            hover:border-primary py-3 lg:py-0 px-6 lg:px-3 text-700 select-none text-xl lg:text-base lg:font-base w-full lg:w-auto"
-                >
-                  <span>Kids</span>
-                  <Ripple />
-                </a>
-              </StyleClass>
+                <span>Kids</span>
+                <Ripple />
+              </a>
               <div className="surface-overlay shadow-none lg:shadow-2 hidden lg:absolute w-full left-0 top-100 pl-8 pr-6 lg:px-6 py-0 lg:py-6 z-1">
                 <div className="grid flex-wrap">
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef13}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef13}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Baby & Kids
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Baby & Kids
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -650,19 +584,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef14}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef14}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Clothing
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Clothing
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -702,19 +626,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef15}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef15}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Shoes
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Shoes
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -748,19 +662,9 @@ const HomePage = () => {
                     </ul>
                   </div>
                   <div className="col-12 md:col-6 xl:col-3">
-                    <StyleClass
-                      nodeRef={btnRef16}
-                      selector="@next"
-                      enterClassName="hidden"
-                      leaveToClassName="hidden"
-                    >
-                      <a
-                        ref={btnRef16}
-                        className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none"
-                      >
-                        Accessories
-                      </a>
-                    </StyleClass>
+                    <a className="font-medium text-lg cursor-pointer text-700 block lg:hidden mb-3 select-none">
+                      Accessories
+                    </a>
                     <ul className="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                       <li className="hidden lg:block">
                         <img
@@ -871,7 +775,7 @@ const HomePage = () => {
             <li className="flex justify-content-center">
               <a
                 className="p-ripple text-900 font-medium inline-flex align-items-center cursor-pointer lg:pl-3 pr-3 hover:text-primary"
-                onClick={() => navigate("/order")}
+                onClick={() => navigate("/cart")}
               >
                 <i className="pi pi-shopping-cart text-xl p-overlay-badge">
                   <Badge />
@@ -1072,110 +976,48 @@ const HomePage = () => {
         <div className="text-900 font-medium text-4xl mb-4">Popular Items</div>
 
         <div className="grid -mt-3 -ml-3 -mr-3">
-          <div className="col-12 md:col-6 lg:col-3 mb-3 lg:mb-0">
-            <p className="text-900 font-medium text-xl mb-2">From Brand</p>
-            <div className="p-2">
-              <div className="relative">
-                <img
-                  src="/photo/productlist/product-list-1-1.png"
-                  className="w-full"
-                  alt="product-list-1-1"
-                />
-                <button
-                  type="text"
-                  className="p-ripple p-link w-3rem h-3rem surface-0 hover:surface-200 border-circle shadow-2 inline-flex align-items-center justify-content-center absolute transition-colors transition-duration-300"
-                  style={{ top: "1rem", right: "1rem" }}
-                >
-                  <i className="pi pi-heart text-2xl text-500"></i>
-                </button>
+          {loading ? (
+            <div>Loading...</div>
+          ) : (
+            data.map((product, key) => (
+              <div className="col-12 md:col-6 lg:col-3 mb-3 lg:mb-0" key={key}>
+                <p className="text-900 font-medium text-xl mb-2">
+                  {product.category?.category || "Product"}
+                </p>
+                <div className="p-2">
+                  <div className="relative">
+                    <img
+                      src={
+                        product.productImage?.[0] ||
+                        "/photo/productlist/product-list-1-1.png"
+                      }
+                      className="w-full cursor-pointer"
+                      alt={product.category?.category || "product"}
+                      onClick={() => navigate("/category")}
+                    />
+                    <button
+                      type="text"
+                      className="p-ripple p-link w-3rem h-3rem surface-0 hover:surface-200 border-circle shadow-2 inline-flex align-items-center justify-content-center absolute transition-colors transition-duration-300"
+                      style={{ top: "1rem", right: "1rem" }}
+                    >
+                      <i className="pi pi-heart text-2xl text-500"></i>
+                    </button>
+                  </div>
+                  <div className="flex align-items-center justify-content-between mt-3 mb-2">
+                    <span className="text-900 font-medium text-xl">
+                      {product.category?.category || "Product Name"}
+                    </span>
+                    <span className="text-900 text-xl ml-3">
+                      ${product.productPrice?.basePrice || "--"}
+                    </span>
+                  </div>
+                  <span className="text-600">
+                    {product.productColour?.colorName || ""}
+                  </span>
+                </div>
               </div>
-              <div className="flex align-items-center justify-content-between mt-3 mb-2">
-                <span className="text-900 font-medium text-xl">
-                  Product Name
-                </span>
-                <span className="text-900 text-xl ml-3">$14</span>
-              </div>
-              <span className="text-600">Black</span>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3 mb-3 lg:mb-0">
-            <p className="text-900 font-medium text-xl mb-2">Best Sellers</p>
-            <div className="p-2">
-              <div className="relative">
-                <img
-                  src="/photo/productlist/product-list-1-2.png"
-                  className="w-full"
-                  alt="product-list-1-2"
-                />
-                <button
-                  type="text"
-                  className="p-ripple p-link w-3rem h-3rem surface-0 hover:surface-200 border-circle shadow-2 inline-flex align-items-center justify-content-center absolute transition-colors transition-duration-300"
-                  style={{ top: "1rem", right: "1rem" }}
-                >
-                  <i className="pi pi-heart text-2xl text-500"></i>
-                </button>
-              </div>
-              <div className="flex align-items-center justify-content-between mt-3 mb-2">
-                <span className="text-900 font-medium text-xl">
-                  Product Name
-                </span>
-                <span className="text-900 text-xl ml-3">$24</span>
-              </div>
-              <span className="text-600">Beige</span>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3 mb-3 lg:mb-0">
-            <p className="text-900 font-medium text-xl mb-2">Top Pick</p>
-            <div className="p-2">
-              <div className="relative">
-                <img
-                  src="/photo/productlist/product-list-1-3.png"
-                  className="w-full"
-                  alt="product-list-1-3"
-                />
-                <button
-                  type="text"
-                  className="p-ripple p-link w-3rem h-3rem surface-0 hover:surface-200 border-circle shadow-2 inline-flex align-items-center justify-content-center absolute transition-colors transition-duration-300"
-                  style={{ top: "1rem", right: "1rem" }}
-                >
-                  <i className="pi pi-heart text-2xl text-500"></i>
-                </button>
-              </div>
-              <div className="flex align-items-center justify-content-between mt-3 mb-2">
-                <span className="text-900 font-medium text-xl">
-                  Product Name
-                </span>
-                <span className="text-900 text-xl ml-3">$42</span>
-              </div>
-              <span className="text-600">White</span>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <p className="text-900 font-medium text-xl mb-2">Discount 20%</p>
-            <div className="p-2">
-              <div className="relative">
-                <img
-                  src="/photo/productlist/product-list-1-4.png"
-                  className="w-full"
-                  alt="product-list-1-4"
-                />
-                <button
-                  type="text"
-                  className="p-ripple p-link w-3rem h-3rem surface-0 hover:surface-200 border-circle shadow-2 inline-flex align-items-center justify-content-center absolute transition-colors transition-duration-300"
-                  style={{ top: "1rem", right: "1rem" }}
-                >
-                  <i className="pi pi-heart text-2xl text-500"></i>
-                </button>
-              </div>
-              <div className="flex align-items-center justify-content-between mt-3 mb-2">
-                <span className="text-900 font-medium text-xl">
-                  Product Name
-                </span>
-                <span className="text-900 text-xl ml-3">$20</span>
-              </div>
-              <span className="text-600">Black</span>
-            </div>
-          </div>
+            ))
+          )}
         </div>
       </div>
 

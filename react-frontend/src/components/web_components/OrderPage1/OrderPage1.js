@@ -11,7 +11,8 @@ import client from "../../../services/restClient";
 const OrderPage1 = (props) => {
   const navigate = useNavigate();
   const urlParams = useParams();
-  const [data, setData] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [customerInfo, setCustomerInfo] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -24,36 +25,16 @@ const OrderPage1 = (props) => {
   const btnRef4 = useRef(null);
   const btnRef5 = useRef(null);
 
-  const cartItems = [];
-
+  // Fetch cart items
   useEffect(() => {
+    if (!props.user?._id) return;
     setLoading(true);
     props.show();
     client
-      .service("order")
-      .find({
-        query: {
-          $limit: 10000,
-          customerName: urlParams.singleCustomerDetailsId,
-          $populate: [
-            { path: "createdBy", service: "users", select: ["name"] },
-            { path: "updatedBy", service: "users", select: ["name"] },
-            {
-              path: "customerName",
-              service: "customer_details",
-              select: [
-                "customerName",
-                "customerEmail",
-                "customerAddress",
-                "phoneNumber",
-              ],
-            },
-          ],
-        },
-      })
+      .service("cartItems")
+      .find({ query: { $limit: 10000 } })
       .then((res) => {
-        let results = res.data;
-        setData(results);
+        setCartItems(res.data);
         props.hide();
         setLoading(false);
       })
@@ -61,13 +42,66 @@ const OrderPage1 = (props) => {
         console.log({ error });
         setLoading(false);
         props.hide();
-        props.alert({
-          title: "Order",
-          type: "error",
-          message: error.message || "Failed get Order",
-        });
       });
-  }, []);
+  }, [props.user?._id]);
+
+  // Fetch customer details + address for the logged-in user
+  useEffect(() => {
+    if (!props.user?._id) return;
+    client
+      .service("customerDetails")
+      .find({
+        query: {
+          createdBy: props.user._id,
+          $limit: 1,
+          $populate: [
+            {
+              path: "customerAddress",
+              service: "customerAddress",
+              select: [
+                "addressType",
+                "addressLine1",
+                "addressLine2",
+                "city",
+                "postalCode",
+                "country",
+              ],
+            },
+          ],
+        },
+      })
+      .then((res) => {
+        if (res.data && res.data.length > 0) setCustomerInfo(res.data[0]);
+      })
+      .catch((error) => console.log("customerDetails error:", error));
+  }, [props.user?._id]);
+
+  const subtotal = cartItems.reduce((sum, item) => {
+    return (
+      sum + (parseFloat(item?.price) || 0) * (parseInt(item?.quantity) || 1)
+    );
+  }, 0);
+  const tax = subtotal * 0.06;
+  const finalTotal = subtotal + tax;
+
+  const addr = customerInfo?.customerAddress;
+  const shippingAddress = addr
+    ? [
+        customerInfo?.customers,
+        addr.addressLine1,
+        addr.addressLine2,
+        addr.city,
+        addr.postalCode,
+        addr.country,
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : "No address on file";
+  const today = new Date().toLocaleDateString("en-MY", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   return (
     <>
@@ -285,76 +319,124 @@ const OrderPage1 = (props) => {
             Thanks for your order!
           </span>
           <div className="flex mt-3 sm:mt-0">
-            <div className="flex flex-column align-items-center">
-              <span className="text-900 font-medium mb-2">Order ID</span>
-              <span className="text-700">451234</span>
-            </div>
             <div className="flex flex-column align-items-center ml-6 md:ml-8">
               <span className="text-900 font-medium mb-2">Order Date</span>
-              <span className="text-700">7 Feb 2023</span>
+              <span className="text-700">{today}</span>
             </div>
           </div>
         </div>
-        <div className="flex flex-column md:flex-row md:align-items-center border-bottom-1 surface-border py-5">
-          <img
-            src="photo/ordersummary/order-summary-2-1.png"
-            className="w-15rem flex-shrink-0 md:mr-6"
-          />
-          <div className="flex-auto mt-3 md:mt-0">
-            <span className="text-xl text-900">Product Name</span>
-            <div className="font-medium text-2xl text-900 mt-3 mb-5">
-              Order Processing
-            </div>
-            <div
-              className="border-round overflow-hidden surface-300 mb-3"
-              style={{ height: "7px" }}
-            >
-              <div className="bg-primary border-round w-4 h-full"></div>
-            </div>
-            <div className="flex w-full justify-content-between">
-              <span className="text-900 text-xs sm:text-base">Ordered</span>
-              <span className="text-900 font-medium text-xs sm:text-base">
-                Processing
-              </span>
-              <span className="text-500 text-xs sm:text-base">Shipping</span>
-              <span className="text-500 text-xs sm:text-base">Delivered</span>
-            </div>
+
+        {/* Dynamic cart items */}
+        {loading ? (
+          <div className="text-center py-6">
+            <i className="pi pi-spin pi-spinner text-4xl text-primary"></i>
           </div>
-        </div>
+        ) : cartItems.length === 0 ? (
+          <div className="text-center py-6 text-600 text-xl border-bottom-1 surface-border">
+            No items in your order.
+          </div>
+        ) : (
+          cartItems.map((item, index) => {
+            const itemName = item?.productName || "Unknown Product";
+            const itemPrice = parseFloat(item?.price) || 0;
+            const itemQty = parseInt(item?.quantity) || 1;
+            const itemSize = item?.size || "N/A";
+            return (
+              <div
+                key={item._id || index}
+                className="flex flex-column md:flex-row md:align-items-center border-bottom-1 surface-border py-5"
+              >
+                <img
+                  src="/lightning/NikeAirMax.jpeg"
+                  className="w-8rem border-round flex-shrink-0 md:mr-6"
+                  alt="product"
+                />
+                <div className="flex-auto mt-3 md:mt-0">
+                  <span className="text-xl text-900 font-medium">
+                    {itemName}
+                  </span>
+                  <div className="text-600 mt-1 mb-2">
+                    Size: {itemSize} &nbsp;|&nbsp; Qty: {itemQty}
+                  </div>
+                  <div className="font-medium text-2xl text-900 mt-2 mb-4">
+                    Order Processing
+                  </div>
+                  <div
+                    className="border-round overflow-hidden surface-300 mb-3"
+                    style={{ height: "7px" }}
+                  >
+                    <div className="bg-primary border-round w-4 h-full"></div>
+                  </div>
+                  <div className="flex w-full justify-content-between">
+                    <span className="text-900 text-xs sm:text-base">
+                      Ordered
+                    </span>
+                    <span className="text-900 font-medium text-xs sm:text-base">
+                      Processing
+                    </span>
+                    <span className="text-500 text-xs sm:text-base">
+                      Shipping
+                    </span>
+                    <span className="text-500 text-xs sm:text-base">
+                      Delivered
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+
         <div className="py-5 flex justify-content-between flex-wrap">
-          <div className="flex sm:mr-5 mb-5">
-            <span className="font-medium text-900 text-xl mr-8">
-              Product Name
-            </span>
-            <span className="text-900 text-xl">$21.00</span>
-          </div>
+          {/* Total */}
           <div className="flex flex-column sm:mr-5 mb-5">
-            <span className="font-medium text-900 text-xl">
+            <span className="font-medium text-900 text-xl mb-3">
+              Order Total
+            </span>
+            <div className="flex flex-column text-900">
+              <span className="mb-1">Subtotal: RM {subtotal.toFixed(2)}</span>
+              <span className="mb-1">VAT (6%): RM {tax.toFixed(2)}</span>
+              <span className="font-bold text-xl">
+                Total: RM {finalTotal.toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          {/* Shipping Address */}
+          <div className="flex flex-column sm:mr-5 mb-5">
+            <span className="font-medium text-900 text-xl mb-3">
               Shipping Address
             </span>
-            <div className="flex flex-column text-900 mt-3">
-              <span className="mb-1">Celeste Slater</span>
-              <span className="mb-1">
-                606-3727 Ullamcorper. Roseville NH 11523
-              </span>
-              <span>(786) 713-8616</span>
-            </div>
-          </div>
-          <div className="flex flex-column">
-            <span className="font-medium text-900 text-xl">Payment</span>
-            <div className="flex align-items-center mt-3">
-              <img src="/photo/ordersummary/visa.png" className="w-4rem mr-3" />
-              <div className="flex flex-column">
-                <span className="text-900 mb-1">Visa Debit Card</span>
-                <span className="text-900 font-medium">
-                  **** **** **** 1234
+            <div className="flex flex-column text-900">
+              {addr ? (
+                <>
+                  <span className="mb-1 font-medium">
+                    {customerInfo?.customers}
+                  </span>
+                  <span className="mb-1">
+                    {addr.addressLine1}
+                    {addr.addressLine2 ? `, ${addr.addressLine2}` : ""}
+                  </span>
+                  <span className="mb-1">
+                    {addr.city}
+                    {addr.postalCode ? ` ${addr.postalCode}` : ""}
+                  </span>
+                  <span className="mb-1">{addr.country}</span>
+                  {customerInfo?.phoneNumber && (
+                    <span>{customerInfo.phoneNumber}</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-500">
+                  No address on file. Please update your profile.
                 </span>
-              </div>
+              )}
             </div>
           </div>
-          <div className="flex justify-content-end mt-5">
+
+          <div className="flex justify-content-end mt-5 w-full">
             <Button
-              className="p-button-primary w-full lg:w-auto lg:px-6 flex-order-1 lg:flex-order-2"
+              className="p-button-primary w-full lg:w-auto lg:px-6"
               label="View Order History"
               onClick={() => navigate("/OrderHistory1")}
             />

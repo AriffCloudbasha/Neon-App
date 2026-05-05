@@ -49,17 +49,16 @@ const WebRouter = (props) => {
             <Route path="/categories/:categoryType" element={<CategoryPage1 />} />
             <Route path="/product" exact element={<ProductPage1 />} />
             <Route path="/product/:productId" element={<ProductPage1 />} />
+            <Route path="/product/category/:categoryId" element={<ProductPage1 />} />
             <Route path="/order" exact element={<OrderPage1 />} />
             <Route path="/checkout" exact element={<CheckoutPage1 />} />
             <Route path="/cart" exact element={<CartPage1 />} />
             <Route path="/OrderHistory1" exact element={<OrderHistory1 />} />
             <Route path="/orderhistory1" exact element={<OrderHistory1 />} />
             <Route path="/web-login" exact element={<WebLogin />} />
-            
-
             <Route path="*" element={<NoMatch />} />
         </Routes>
-    );  
+    );
 };
 
 const mapState = (state) => {

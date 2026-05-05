@@ -10,6 +10,17 @@ module.exports = function (app) {
         comment:
           "Product Name, p, false, true, true, true, true, true, true, , , , ,",
       },
+      price: {
+        type: Number,
+        max: 1000000,
+        comment:
+          "Price, currency, false, true, true, true, true, true, true, , , , ,",
+      },
+      size: {
+        type: String,
+        maxLength: 50,
+        comment: "Size, p, false, true, true, true, true, true, true, , , , ,",
+      },
       quantity: {
         type: Number,
         max: 1000000,

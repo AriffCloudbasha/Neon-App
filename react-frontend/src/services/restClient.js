@@ -40,12 +40,14 @@ const shouldSkipAuthRedirect = () => {
     const currentPath = window.location.pathname;
 
     // Skip auth for these exact paths
-    const excludedPaths = ['/login', '/', '/signup', '/login-faq'];
-    if (excludedPaths.includes(currentPath)) return true;
+    const excludedPaths = ['/login', '/', '/homepage', '/signup', '/login-faq', '/category', '/product', '/order', '/checkout', '/cart', '/web-login', '/orderhistory1'];
+    if (excludedPaths.includes(normalizedPath)) return true;
 
-    // Skip auth for reset password URLs (both patterns)
-    const resetPathRegex = /^\/reset\/[a-f0-9]{24}\/?$/i;
-    const loginResetPathRegex = /^\/loginreset\/[a-f0-9]{24}\/?$/i;
+    // Skip auth redirects for public web routes with dynamic segments
+    const publicPathPrefixes = ['/categories/', '/product/', '/orderhistory1/'];
+    if (publicPathPrefixes.some((prefix) => normalizedPath.startsWith(prefix))) {
+        return true;
+    }
 
     if (resetPathRegex.test(currentPath) || loginResetPathRegex.test(currentPath)) {
         return true;

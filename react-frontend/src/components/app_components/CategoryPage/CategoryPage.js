@@ -234,7 +234,7 @@ const CategoryPage = (props) => {
   };
 
   const onRowClick = ({ data }) => {
-    navigate(`/category/${data._id}`);
+    navigate(`/category/app/${data._id}`);
   };
 
   const menuItems = [

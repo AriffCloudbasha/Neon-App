@@ -35,7 +35,6 @@ const CategoryPage1 = (props) => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showFavorites, setShowFavorites] = useState(false);
-  const [categoryImageMap, setCategoryImageMap] = useState({});
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -74,61 +73,6 @@ const CategoryPage1 = (props) => {
         ].map((t) => ({ name: t }));
         setTypes(uniqueTypes);
 
-        // Fetch one product image per category
-        const categoryIds = results.map((r) => r._id);
-        if (categoryIds.length > 0) {
-          client
-            .service("product")
-            .find({
-              query: {
-                $limit: 1000,
-                $populate: [
-                  {
-                    path: "productImage",
-                    service: "documentStorages",
-                    select: ["url"],
-                  },
-                ],
-              },
-            })
-            .then((productRes) => {
-              console.log(
-                "[CategoryPage] raw products:",
-                JSON.stringify(
-                  productRes.data.map((p) => ({
-                    id: p._id,
-                    category: p.category,
-                    productImage: p.productImage,
-                  })),
-                  null,
-                  2,
-                ),
-              );
-              const imageMap = {};
-              const serverUrl = process.env.REACT_APP_SERVER_URL || "";
-              productRes.data.forEach((product) => {
-                const catId = product.category
-                  ? (product.category._id || product.category).toString()
-                  : null;
-                const rawUrl = product.productImage?.[0]?.url;
-                const url = rawUrl
-                  ? rawUrl.startsWith("/uploads")
-                    ? `${serverUrl}${rawUrl}`
-                    : rawUrl
-                  : null;
-                if (catId && !imageMap[catId] && url) {
-                  imageMap[catId] = url;
-                }
-              });
-              setCategoryImageMap(imageMap);
-              console.log(
-                "[CategoryPage] imageMap:",
-                JSON.stringify(imageMap, null, 2),
-              );
-            })
-            .catch(() => {});
-        }
-
         props.hide();
         setLoading(false);
       })
@@ -143,6 +87,11 @@ const CategoryPage1 = (props) => {
         });
       });
   }, [categoryType]);
+
+  const fallbackImages = [
+    "/lightning/NikeAirMax.jpeg",
+    "/lightning/Necklace.jpg",
+  ];
 
   return (
     <>
@@ -272,7 +221,7 @@ const CategoryPage1 = (props) => {
               <li className="flex justify-content-center">
                 <a
                   className="p-ripple text-900 font-medium inline-flex align-items-center cursor-pointer lg:pl-3 pr-3 hover:text-primary"
-                  onClick={() => navigate("/order")}
+                  onClick={() => navigate("/cart")}
                 >
                   <i className="pi pi-shopping-cart text-xl p-overlay-badge">
                     <Badge />
@@ -416,20 +365,27 @@ const CategoryPage1 = (props) => {
                   const saleMatch = !checked2 || item.isSale;
                   return typeMatch && saleMatch;
                 })
-                .map((item) => (
+                .map((item, idx) => (
                   <div key={item._id} className="col-12 md:col-6 lg:col-3 mb-5">
                     <div className="mb-3 relative">
-                      <Link to={`/product?category=${item._id}`}>
+                      <Link to={`/product/category/${item._id}`}>
                         <img
+                          // OPTIMIZATION: Now looking directly at the Category item's DB field!
                           src={
-                            categoryImageMap[item._id] ||
-                            "/photo/productlist/product-list-2-1.png"
+                            item.imageUrl ||
+                            fallbackImages[idx % fallbackImages.length]
                           }
                           className="w-full"
                           alt={item.type || "category"}
+                          style={{
+                            height: "250px",
+                            objectFit: "cover",
+                            objectPosition: "center",
+                            borderRadius: "4px",
+                          }}
                           onError={(e) => {
                             e.target.src =
-                              "/photo/productlist/product-list-2-1.png";
+                              fallbackImages[idx % fallbackImages.length];
                           }}
                         />
                       </Link>
@@ -458,7 +414,7 @@ const CategoryPage1 = (props) => {
                     </div>
                     <div className="flex flex-column align-items-center">
                       <Link
-                        to={`/product?category=${item._id}`}
+                        to={`/product/category/${item._id}`}
                         className="text-xl text-900 font-medium mb-2 text-center"
                       >
                         {item.type || "Category"}
@@ -491,7 +447,7 @@ const CategoryPage1 = (props) => {
               Get Deals and Updates from Peak
             </span>
             <span className="block text-cyan-600 mt-3">
-              We promise for not sending spam emails. Itâ€™ll only good emails.
+              We promise for not sending spam emails. It’ll only good emails.
             </span>
             <div
               className="p-inputgroup relative mt-4"
@@ -708,7 +664,7 @@ const CategoryPage1 = (props) => {
       <div className="surface-200 px-4 py-2 md:px-6 lg:px-8 flex flex-column lg:flex-row justify-content-between align-items-center">
         <div className="col-fixed flex flex-wrap flex-order-1 lg:flex-order-0 text-center lg:text-left">
           <span className="text-500">
-            Â© 2022, Peak. Powered by PrimeBlocks.
+            © 2022, Peak. Powered by PrimeBlocks.
           </span>
         </div>
         <div className="col-fixed flex align-items-center flex-order-0 lg:flex-order-1">

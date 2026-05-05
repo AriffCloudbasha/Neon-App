@@ -42,32 +42,17 @@ const CheckoutPage1 = (props) => {
     { name: "Malaysia", code: "MY" },
   ];
 
-  const [quantities, setQuantities] = useState([1]);
   const [value1, setValue1] = useState("");
 
   useEffect(() => {
+    if (!props.user?._id) return;
     setLoading(true);
     props.show();
     client
-      .service("checkout")
-      .find({
-        query: {
-          $limit: 10000,
-          productName: urlParams.singleProductId,
-          $populate: [
-            { path: "createdBy", service: "users", select: ["name"] },
-            { path: "updatedBy", service: "users", select: ["name"] },
-            {
-              path: "productName",
-              service: "product",
-              select: ["productTitle", "description", "price", "productImage"],
-            },
-          ],
-        },
-      })
+      .service("cartItems")
+      .find({ query: { $limit: 10000 } })
       .then((res) => {
-        let results = res.data;
-        setData(results);
+        setData(res.data);
         props.hide();
         setLoading(false);
       })
@@ -78,10 +63,20 @@ const CheckoutPage1 = (props) => {
         props.alert({
           title: "Checkout",
           type: "error",
-          message: error.message || "Failed get Checkout",
+          message: error.message || "Failed to load cart",
         });
       });
-  }, []);
+  }, [props.user?._id]);
+
+  const cartItems = Array.isArray(data) ? data : [];
+
+  const subtotal = cartItems.reduce((sum, item) => {
+    return (
+      sum + (parseFloat(item?.price) || 0) * (parseInt(item?.quantity) || 1)
+    );
+  }, 0);
+  const tax = subtotal * 0.06;
+  const finalTotal = subtotal + tax;
 
   return (
     <>
@@ -94,11 +89,11 @@ const CheckoutPage1 = (props) => {
           className="cursor-pointer h-full inline-flex align-items-center mt-3 lg:mt-0 lg:py-0"
         >
           <img
-            src="/photo/storefront/storefront-1-19.png"
-            className="mr-2"
+            src="/lightning/flag_of_malaysia.svg"
+            className="mr-2 h-1rem w-auto"
             alt="Flag"
           />
-          <span className="text-0">EUR</span>
+          <span className="text-0">MY</span>
         </a>
       </div>
       <div className="surface-overlay px-3 sm:px-7 flex flex-wrap align-items-stretch justify-content-between relative lg:border-bottom-1 surface-border">
@@ -370,7 +365,11 @@ const CheckoutPage1 = (props) => {
 
         <div className="flex align-items-center justify-content-center py-3">
           <a onClick={() => navigate("/Homepage")} className="cursor-pointer">
-            <img src="/photo/logos/peak-700.svg" alt="Image" height="40" />
+            <img
+              src="/lightning/apple-touch-icon.png"
+              alt="Image"
+              height="40"
+            />
           </a>
         </div>
         <div className="lg:flex w-full lg:w-auto hidden py-3 lg:py-0">
@@ -580,45 +579,51 @@ const CheckoutPage1 = (props) => {
           </div>
           <div className="col-12 lg:col-6 px-4 py-8 md:px-6 lg:px-8 surface-50">
             <div className="border-bottom-1 pb-3 surface-border">
-              <span className="text-900 font-medium text-xl">Your Cart</span>
+              <span className="text-900 font-medium text-xl">
+                Your Cart ({cartItems.length} item
+                {cartItems.length !== 1 ? "s" : ""})
+              </span>
             </div>
-            <div className="flex flex-column lg:flex-row flex-wrap lg:align-items-center py-2 mt-3 border-bottom-1 surface-border">
-              <img
-                src="/photo/checkoutform/checkoutform-1-2.png"
-                className="w-8rem h-8rem flex-shrink-0"
-                alt="checkoutform-1-2"
-              />
-              <div className="flex-auto mt-3 md:mt-0 md:ml-3">
-                <div className="flex align-items-center justify-content-between mb-3">
-                  <span className="text-900 font-medium">Product Name</span>
-                  <span className="text-900 font-bold">$123.00</span>
-                </div>
-                <div className="text-600 text-sm mb-3">Black | Large</div>
-                <div className="flex flex-auto justify-content-between align-items-center">
-                  <InputNumber
-                    showButtons
-                    buttonLayout="horizontal"
-                    min={0}
-                    inputClassName="w-2rem text-center py-2 px-1 border-transparent"
-                    value={quantities[0]}
-                    onChange={(e) => {
-                      let q = [...quantities];
-                      q[0] = e.value;
-                      setQuantities(q);
-                    }}
-                    className="border-1 surface-border border-round"
-                    decrementButtonClassName="p-button-text text-600 hover:text-primary py-1 px-1"
-                    incrementButtonClassName="p-button-text text-600 hover:text-primary py-1 px-1"
-                    incrementButtonIcon="pi pi-plus"
-                    decrementButtonIcon="pi pi-minus"
-                  />
-                  <Button
-                    icon="pi pi-trash"
-                    className="p-button-text p-button-rounded"
-                  />
-                </div>
+            {loading ? (
+              <div className="text-center py-4">
+                <i className="pi pi-spin pi-spinner text-3xl text-primary"></i>
               </div>
-            </div>
+            ) : cartItems.length === 0 ? (
+              <div className="text-center py-4 text-600">
+                Your cart is empty.
+              </div>
+            ) : (
+              cartItems.map((item, index) => {
+                const itemName = item?.productName || "Unknown Product";
+                const itemSize = item?.size || "N/A";
+                const itemPrice = parseFloat(item?.price) || 0;
+                const itemQty = parseInt(item?.quantity) || 1;
+                return (
+                  <div
+                    key={item._id || index}
+                    className="flex flex-column lg:flex-row flex-wrap lg:align-items-center py-2 mt-3 border-bottom-1 surface-border"
+                  >
+                    <img
+                      src="/lightning/NikeAirMax.jpeg"
+                      className="w-8rem h-8rem flex-shrink-0 border-round"
+                      alt="product"
+                    />
+                    <div className="flex-auto mt-3 lg:mt-0 lg:ml-3">
+                      <div className="flex align-items-center justify-content-between mb-2">
+                        <span className="text-900 font-medium">{itemName}</span>
+                        <span className="text-900 font-bold">
+                          RM {(itemPrice * itemQty).toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="text-600 text-sm mb-2">
+                        Size: {itemSize}
+                      </div>
+                      <div className="text-600 text-sm">Qty: {itemQty}</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
             <div className="py-2 mt-3 border-bottom-1 surface-border">
               <div className="p-inputgroup mb-3">
                 <InputText
@@ -633,15 +638,21 @@ const CheckoutPage1 = (props) => {
             <div className="py-2 mt-3">
               <div className="flex justify-content-between align-items-center mb-3">
                 <span className="text-900 font-medium">Subtotal</span>
-                <span className="text-900">$123.00</span>
+                <span className="text-900">RM {subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-content-between align-items-center mb-3">
                 <span className="text-900 font-medium">Shipping</span>
                 <span className="text-primary font-bold">Free</span>
               </div>
               <div className="flex justify-content-between align-items-center mb-3">
+                <span className="text-900 font-medium">VAT (6%)</span>
+                <span className="text-900">RM {tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-content-between align-items-center mb-3">
                 <span className="text-900 font-bold">Total</span>
-                <span className="text-900 font-medium text-xl">$123.00</span>
+                <span className="text-900 font-bold text-xl">
+                  RM {finalTotal.toFixed(2)}
+                </span>
               </div>
             </div>
             <div className="py-2 mt-3 bg-yellow-100 flex align-items-center justify-content-center">
